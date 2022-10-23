@@ -1,13 +1,19 @@
 #CC = gcc
 #CXX = g++
-#CC = clang
+CC = clang
 #CXX = clang++
-#CXX = clang++ -stdlib=libc++
-CC = clang-omp
-CXX = clang-omp++
+CXX = clang++ -stdlib=libc++
+# CC = clang-omp
+# CXX = clang-omp++
 AR = ar
 
-ARCHOPTS = -m32 -march=core2 -mfpmath=sse -mtune=native
+# distinguish Mac and Mac-M1
+ARCH := $(shell uname -m)
+ifeq ($(ARCH),arm64)
+	ARCHOPTS = -m64 -mcpu=apple-m1 -mtune=native
+else
+	ARCHOPTS = -m32 -march=core2 -mfpmath=sse -mtune=native
+endif
 COPTS = -fno-strict-overflow -fno-math-errno -fno-trapping-math
 COPTS += -Wall -Wextra -Wshadow
 DEFINES = -U_FORTIFY_SOURCE

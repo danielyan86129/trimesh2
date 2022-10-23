@@ -1,4 +1,9 @@
 include $(MAKERULESDIR)/Makedefs.Darwin
 
-ARCHOPTS = -m64 -march=core2 -mfpmath=sse -mtune=native
-
+# distinguish Mac and Mac-M1
+ARCH := $(shell uname -m)
+ifeq ($(ARCH),arm64)
+	ARCHOPTS = -m64 -mcpu=apple-m1 -mtune=native
+else
+	ARCHOPTS = -m64 -march=core2 -mfpmath=sse -mtune=native
+endif
