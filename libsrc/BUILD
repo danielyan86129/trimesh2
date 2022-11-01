@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 copts = [
     "-Wno-unused-parameter",
     "-Wno-shadow",
@@ -18,7 +20,7 @@ cc_library(
     hdrs = ["shape_data.inc"],
     copts = copts,
     linkopts = linkopts,
-    visibility = ["//utilsrc:__pkg__"],
+    # visibility = ["//utilsrc:__pkg__"],
     deps = [
         "//include:main",
     ],
