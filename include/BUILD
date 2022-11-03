@@ -23,9 +23,7 @@ cc_library(
     hdrs = glob([
         "*.h",
     ]),
-    includes = [
-        ".",
-    ],
+    # include_prefix = "trimesh",
     visibility = [
         "//gluit:__pkg__",
         "//libsrc:__pkg__",
