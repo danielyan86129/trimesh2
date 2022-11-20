@@ -7,7 +7,7 @@ copts = [
     "-Wno-cast-function-type",
     # "-Wno-restrict",
     # "-Wno-stringop-truncation",
-    "-Iinclude/",
+    # "-Iinclude/",
 ]
 
 linkopts = [
