@@ -72,129 +72,124 @@
  * OpenGL(TM) is a trademark of Silicon Graphics, Inc.
  */
 
-#include <GL/freeglut.h>
 #include "freeglut_internal.h"
 #include "freeglut_teapot_data.h"
+#include <GL/freeglut.h>
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
-
-static void fghTeapot( GLint grid, GLdouble scale, GLenum type )
+static void fghTeapot(GLint grid, GLdouble scale, GLenum type)
 {
 #if defined(_WIN32_WCE)
-		int i, numV=sizeof(strip_vertices)/4, numI=sizeof(strip_normals)/4;
+    int i, numV = sizeof(strip_vertices) / 4, numI = sizeof(strip_normals) / 4;
 #else
     double p[4][4][3], q[4][4][3], r[4][4][3], s[4][4][3];
     long i, j, k, l;
 #endif
 
-    glPushAttrib( GL_ENABLE_BIT | GL_EVAL_BIT );
-    glEnable( GL_AUTO_NORMAL );
-    glEnable( GL_NORMALIZE );
-    glEnable( GL_MAP2_VERTEX_3 );
-    glEnable( GL_MAP2_TEXTURE_COORD_2 );
+    glPushAttrib(GL_ENABLE_BIT | GL_EVAL_BIT);
+    glEnable(GL_AUTO_NORMAL);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_MAP2_VERTEX_3);
+    glEnable(GL_MAP2_TEXTURE_COORD_2);
 
     glPushMatrix();
-    glRotated( 270.0, 1.0, 0.0, 0.0 );
-    glScaled( 0.5 * scale, 0.5 * scale, 0.5 * scale );
-    glTranslated( 0.0, 0.0, -1.5 );
+    glRotated(270.0, 1.0, 0.0, 0.0);
+    glScaled(0.5 * scale, 0.5 * scale, 0.5 * scale);
+    glTranslated(0.0, 0.0, -1.5);
 
 #if defined(_WIN32_WCE)
-    glRotated( 90.0, 1.0, 0.0, 0.0 );
-    glBegin( GL_TRIANGLE_STRIP );
+    glRotated(90.0, 1.0, 0.0, 0.0);
+    glBegin(GL_TRIANGLE_STRIP);
 
-    for( i = 0; i < numV-1; i++ )
+    for (i = 0; i < numV - 1; i++)
     {
-        int vidx = strip_vertices[i],
-            nidx = strip_normals[i];
+        int vidx = strip_vertices[i], nidx = strip_normals[i];
 
-        if( vidx != -1 )
+        if (vidx != -1)
         {
-            glNormal3fv( normals[nidx]  );
-            glVertex3fv( vertices[vidx] );
+            glNormal3fv(normals[nidx]);
+            glVertex3fv(vertices[vidx]);
         }
         else
         {
             glEnd();
-            glBegin( GL_TRIANGLE_STRIP );
+            glBegin(GL_TRIANGLE_STRIP);
         }
     }
 
     glEnd();
 #else
-    for (i = 0; i < 10; i++) {
-      for (j = 0; j < 4; j++) {
-        for (k = 0; k < 4; k++) {
-          for (l = 0; l < 3; l++) {
-            p[j][k][l] = cpdata[patchdata[i][j * 4 + k]][l];
-            q[j][k][l] = cpdata[patchdata[i][j * 4 + (3 - k)]][l];
-            if (l == 1)
-              q[j][k][l] *= -1.0;
-            if (i < 6) {
-              r[j][k][l] =
-                cpdata[patchdata[i][j * 4 + (3 - k)]][l];
-              if (l == 0)
-                r[j][k][l] *= -1.0;
-              s[j][k][l] = cpdata[patchdata[i][j * 4 + k]][l];
-              if (l == 0)
-                s[j][k][l] *= -1.0;
-              if (l == 1)
-                s[j][k][l] *= -1.0;
+    for (i = 0; i < 10; i++)
+    {
+        for (j = 0; j < 4; j++)
+        {
+            for (k = 0; k < 4; k++)
+            {
+                for (l = 0; l < 3; l++)
+                {
+                    p[j][k][l] = cpdata[patchdata[i][j * 4 + k]][l];
+                    q[j][k][l] = cpdata[patchdata[i][j * 4 + (3 - k)]][l];
+                    if (l == 1)
+                        q[j][k][l] *= -1.0;
+                    if (i < 6)
+                    {
+                        r[j][k][l] = cpdata[patchdata[i][j * 4 + (3 - k)]][l];
+                        if (l == 0)
+                            r[j][k][l] *= -1.0;
+                        s[j][k][l] = cpdata[patchdata[i][j * 4 + k]][l];
+                        if (l == 0)
+                            s[j][k][l] *= -1.0;
+                        if (l == 1)
+                            s[j][k][l] *= -1.0;
+                    }
+                }
             }
-          }
         }
-      }
 
-      glMap2d(GL_MAP2_TEXTURE_COORD_2, 0.0, 1.0, 2, 2, 0.0, 1.0, 4, 2,
-        &tex[0][0][0]);
-      glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
-        &p[0][0][0]);
-      glMapGrid2d(grid, 0.0, 1.0, grid, 0.0, 1.0);
-      glEvalMesh2(type, 0, grid, 0, grid);
-      glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
-        &q[0][0][0]);
-      glEvalMesh2(type, 0, grid, 0, grid);
-      if (i < 6) {
-        glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
-          &r[0][0][0]);
+        glMap2d(GL_MAP2_TEXTURE_COORD_2, 0.0, 1.0, 2, 2, 0.0, 1.0, 4, 2,
+                &tex[0][0][0]);
+        glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &p[0][0][0]);
+        glMapGrid2d(grid, 0.0, 1.0, grid, 0.0, 1.0);
         glEvalMesh2(type, 0, grid, 0, grid);
-        glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
-          &s[0][0][0]);
+        glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &q[0][0][0]);
         glEvalMesh2(type, 0, grid, 0, grid);
-      }
+        if (i < 6)
+        {
+            glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
+                    &r[0][0][0]);
+            glEvalMesh2(type, 0, grid, 0, grid);
+            glMap2d(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,
+                    &s[0][0][0]);
+            glEvalMesh2(type, 0, grid, 0, grid);
+        }
     }
-#endif  /* defined(_WIN32_WCE) */
+#endif /* defined(_WIN32_WCE) */
 
     glPopMatrix();
     glPopAttrib();
 }
-
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
  * Renders a beautiful wired teapot...
  */
-void FGAPIENTRY glutWireTeapot( GLdouble size )
+void FGAPIENTRY glutWireTeapot(GLdouble size)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWireTeapot" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutWireTeapot");
     /* We will use the general teapot rendering code */
-    fghTeapot( 10, size, GL_LINE );
+    fghTeapot(10, size, GL_LINE);
 }
 
 /*
  * Renders a beautiful filled teapot...
  */
-void FGAPIENTRY glutSolidTeapot( GLdouble size )
+void FGAPIENTRY glutSolidTeapot(GLdouble size)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSolidTeapot" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutSolidTeapot");
     /* We will use the general teapot rendering code */
-    fghTeapot( 7, size, GL_FILL );
+    fghTeapot(7, size, GL_FILL);
 }
 
 /*** END OF FILE ***/
-
-
-
-
-

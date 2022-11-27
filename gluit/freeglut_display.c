@@ -25,22 +25,23 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#include <GL/freeglut.h>
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
  * Marks the current window to have the redisplay performed when possible...
  */
-void FGAPIENTRY glutPostRedisplay( void )
+void FGAPIENTRY glutPostRedisplay(void)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPostRedisplay" );
-    if ( ! fgStructure.CurrentWindow )
-	{
-      fgError ( " ERROR:  Function <%s> called"
-                " with no current window defined.", "glutPostRedisplay" ) ;
-	}
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutPostRedisplay");
+    if (!fgStructure.CurrentWindow)
+    {
+        fgError(" ERROR:  Function <%s> called"
+                " with no current window defined.",
+                "glutPostRedisplay");
+    }
 
     fgStructure.CurrentWindow->State.Redisplay = GL_TRUE;
 }
@@ -48,39 +49,38 @@ void FGAPIENTRY glutPostRedisplay( void )
 /*
  * Swaps the buffers for the current window (if any)
  */
-void FGAPIENTRY glutSwapBuffers( void )
+void FGAPIENTRY glutSwapBuffers(void)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSwapBuffers" );
-    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSwapBuffers" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutSwapBuffers");
+    FREEGLUT_EXIT_IF_NO_WINDOW("glutSwapBuffers");
 
     /*
      * "glXSwapBuffers" already performs an implicit call to "glFlush". What
      * about "SwapBuffers"?
      */
-    glFlush( );
-    if( ! fgStructure.CurrentWindow->Window.DoubleBuffered )
+    glFlush();
+    if (!fgStructure.CurrentWindow->Window.DoubleBuffered)
         return;
 
 #if TARGET_HOST_POSIX_X11
-    glXSwapBuffers( fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle );
+    glXSwapBuffers(fgDisplay.Display, fgStructure.CurrentWindow->Window.Handle);
 #elif TARGET_HOST_MS_WINDOWS
-    SwapBuffers( fgStructure.CurrentWindow->Window.Device );
+    SwapBuffers(fgStructure.CurrentWindow->Window.Device);
 #endif
 
     /* GLUT_FPS env var support */
-    if( fgState.FPSInterval )
+    if (fgState.FPSInterval)
     {
-        GLint t = glutGet( GLUT_ELAPSED_TIME );
+        GLint t = glutGet(GLUT_ELAPSED_TIME);
         fgState.SwapCount++;
-        if( fgState.SwapTime == 0 )
+        if (fgState.SwapTime == 0)
             fgState.SwapTime = t;
-        else if( t - fgState.SwapTime > fgState.FPSInterval )
+        else if (t - fgState.SwapTime > fgState.FPSInterval)
         {
-            float time = 0.001f * ( t - fgState.SwapTime );
-            float fps = ( float )fgState.SwapCount / time;
-            fprintf( stderr,
-                     "freeglut: %d frames in %.2f seconds = %.2f FPS\n",
-                     fgState.SwapCount, time, fps );
+            float time = 0.001f * (t - fgState.SwapTime);
+            float fps = (float)fgState.SwapCount / time;
+            fprintf(stderr, "freeglut: %d frames in %.2f seconds = %.2f FPS\n",
+                    fgState.SwapCount, time, fps);
             fgState.SwapTime = t;
             fgState.SwapCount = 0;
         }
@@ -90,13 +90,13 @@ void FGAPIENTRY glutSwapBuffers( void )
 /*
  * Mark appropriate window to be displayed
  */
-void FGAPIENTRY glutPostWindowRedisplay( int windowID )
+void FGAPIENTRY glutPostWindowRedisplay(int windowID)
 {
     SFG_Window* window;
 
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutPostWindowRedisplay" );
-    window = fgWindowByID( windowID );
-    freeglut_return_if_fail( window );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutPostWindowRedisplay");
+    window = fgWindowByID(windowID);
+    freeglut_return_if_fail(window);
     window->State.Redisplay = GL_TRUE;
 }
 

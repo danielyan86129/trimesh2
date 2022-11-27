@@ -25,8 +25,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#include <GL/freeglut.h>
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -44,36 +44,38 @@
  *
  * XXX Wouldn't this be simpler and clearer if we used strtok()?
  */
-int FGAPIENTRY glutExtensionSupported( const char* extension )
+int FGAPIENTRY glutExtensionSupported(const char* extension)
 {
-  const char *extensions, *start;
-  const size_t len = strlen( extension );
+    const char *extensions, *start;
+    const size_t len = strlen(extension);
 
-  /* Make sure there is a current window, and thus a current context available */
-  FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutExtensionSupported" );
-  freeglut_return_val_if_fail( fgStructure.CurrentWindow != NULL, 0 );
+    /* Make sure there is a current window, and thus a current context available
+     */
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutExtensionSupported");
+    freeglut_return_val_if_fail(fgStructure.CurrentWindow != NULL, 0);
 
-  if (strchr(extension, ' '))
+    if (strchr(extension, ' '))
+        return 0;
+    start = extensions = (const char*)glGetString(GL_EXTENSIONS);
+
+    /* XXX consider printing a warning to stderr that there's no current
+     * rendering context.
+     */
+    freeglut_return_val_if_fail(extensions != NULL, 0);
+
+    while (1)
+    {
+        const char* p = strstr(extensions, extension);
+        if (!p)
+            return 0; /* not found */
+        /* check that the match isn't a super string */
+        if ((p == start || p[-1] == ' ') && (p[len] == ' ' || p[len] == 0))
+            return 1;
+        /* skip the false match and continue */
+        extensions = p + len;
+    }
+
     return 0;
-  start = extensions = (const char *) glGetString(GL_EXTENSIONS);
-
-  /* XXX consider printing a warning to stderr that there's no current
-   * rendering context.
-   */
-  freeglut_return_val_if_fail( extensions != NULL, 0 );
-
-  while (1) {
-     const char *p = strstr(extensions, extension);
-     if (!p)
-        return 0;  /* not found */
-     /* check that the match isn't a super string */
-     if ((p == start || p[-1] == ' ') && (p[len] == ' ' || p[len] == 0))
-        return 1;
-     /* skip the false match and continue */
-     extensions = p + len;
-  }
-
-  return 0 ;
 }
 
 #ifndef GL_INVALID_FRAMEBUFFER_OPERATION
@@ -103,42 +105,54 @@ int FGAPIENTRY glutExtensionSupported( const char* extension )
 /*
  * A cut-down local version of gluErrorString to avoid depending on GLU.
  */
-static const char* fghErrorString( GLenum error )
+static const char* fghErrorString(GLenum error)
 {
-  switch ( error ) {
-  case GL_INVALID_ENUM: return "invalid enumerant";
-  case GL_INVALID_VALUE: return "invalid value";
-  case GL_INVALID_OPERATION: return "invalid operation";
-  case GL_STACK_OVERFLOW: return "stack overflow";
-  case GL_STACK_UNDERFLOW: return "stack underflow";
-  case GL_OUT_OF_MEMORY: return "out of memory";
-  case GL_TABLE_TOO_LARGE: return "table too large";
-  case GL_INVALID_FRAMEBUFFER_OPERATION: return "invalid framebuffer operation";
-  case GL_TEXTURE_TOO_LARGE: return "texture too large";
-  default: return "unknown GL error";
-  }
+    switch (error)
+    {
+        case GL_INVALID_ENUM:
+            return "invalid enumerant";
+        case GL_INVALID_VALUE:
+            return "invalid value";
+        case GL_INVALID_OPERATION:
+            return "invalid operation";
+        case GL_STACK_OVERFLOW:
+            return "stack overflow";
+        case GL_STACK_UNDERFLOW:
+            return "stack underflow";
+        case GL_OUT_OF_MEMORY:
+            return "out of memory";
+        case GL_TABLE_TOO_LARGE:
+            return "table too large";
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
+            return "invalid framebuffer operation";
+        case GL_TEXTURE_TOO_LARGE:
+            return "texture too large";
+        default:
+            return "unknown GL error";
+    }
 }
 
 /*
  * This function reports all the OpenGL errors that happened till now
  */
-void FGAPIENTRY glutReportErrors( void )
+void FGAPIENTRY glutReportErrors(void)
 {
     GLenum error;
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutReportErrors" );
-    while( ( error = glGetError() ) != GL_NO_ERROR )
-        fgWarning( "GL error: %s", fghErrorString( error ) );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutReportErrors");
+    while ((error = glGetError()) != GL_NO_ERROR)
+        fgWarning("GL error: %s", fghErrorString(error));
 }
 
 /*
  * Control the auto-repeat of keystrokes to the current window
  */
-void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
+void FGAPIENTRY glutIgnoreKeyRepeat(int ignore)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutIgnoreKeyRepeat" );
-    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutIgnoreKeyRepeat" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutIgnoreKeyRepeat");
+    FREEGLUT_EXIT_IF_NO_WINDOW("glutIgnoreKeyRepeat");
 
-    fgStructure.CurrentWindow->State.IgnoreKeyRepeat = ignore ? GL_TRUE : GL_FALSE;
+    fgStructure.CurrentWindow->State.IgnoreKeyRepeat =
+        ignore ? GL_TRUE : GL_FALSE;
 }
 
 /*
@@ -149,65 +163,66 @@ void FGAPIENTRY glutIgnoreKeyRepeat( int ignore )
  *    GLUT_KEY_REPEAT_ON
  *    GLUT_KEY_REPEAT_DEFAULT
  */
-void FGAPIENTRY glutSetKeyRepeat( int repeatMode )
+void FGAPIENTRY glutSetKeyRepeat(int repeatMode)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetKeyRepeat" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutSetKeyRepeat");
 
-    switch( repeatMode )
+    switch (repeatMode)
     {
-    case GLUT_KEY_REPEAT_OFF:
-    case GLUT_KEY_REPEAT_ON:
-     fgState.KeyRepeat = repeatMode;
-     break;
+        case GLUT_KEY_REPEAT_OFF:
+        case GLUT_KEY_REPEAT_ON:
+            fgState.KeyRepeat = repeatMode;
+            break;
 
-    case GLUT_KEY_REPEAT_DEFAULT:
-     fgState.KeyRepeat = GLUT_KEY_REPEAT_ON;
-     break;
+        case GLUT_KEY_REPEAT_DEFAULT:
+            fgState.KeyRepeat = GLUT_KEY_REPEAT_ON;
+            break;
 
-    default:
-        fgError ("Invalid glutSetKeyRepeat mode: %d", repeatMode);
-        break;
+        default:
+            fgError("Invalid glutSetKeyRepeat mode: %d", repeatMode);
+            break;
     }
 }
 
 /*
  * Forces the joystick callback to be executed
  */
-void FGAPIENTRY glutForceJoystickFunc( void )
+void FGAPIENTRY glutForceJoystickFunc(void)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutForceJoystickFunc" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutForceJoystickFunc");
 #if !defined(_WIN32_WCE)
-    freeglut_return_if_fail( fgStructure.CurrentWindow != NULL );
-    freeglut_return_if_fail( FETCH_WCB( *( fgStructure.CurrentWindow ), Joystick ) );
-    fgJoystickPollWindow( fgStructure.CurrentWindow );
+    freeglut_return_if_fail(fgStructure.CurrentWindow != NULL);
+    freeglut_return_if_fail(FETCH_WCB(*(fgStructure.CurrentWindow), Joystick));
+    fgJoystickPollWindow(fgStructure.CurrentWindow);
 #endif /* !defined(_WIN32_WCE) */
 }
 
 /*
  *
  */
-void FGAPIENTRY glutSetColor( int nColor, GLfloat red, GLfloat green, GLfloat blue )
+void FGAPIENTRY glutSetColor(int nColor, GLfloat red, GLfloat green,
+                             GLfloat blue)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetColor" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutSetColor");
     /* We really need to do something here. */
 }
 
 /*
  *
  */
-GLfloat FGAPIENTRY glutGetColor( int color, int component )
+GLfloat FGAPIENTRY glutGetColor(int color, int component)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutGetColor" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutGetColor");
     /* We really need to do something here. */
-    return( 0.0f );
+    return (0.0f);
 }
 
 /*
  *
  */
-void FGAPIENTRY glutCopyColormap( int window )
+void FGAPIENTRY glutCopyColormap(int window)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutCopyColormap" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutCopyColormap");
     /* We really need to do something here. */
 }
 

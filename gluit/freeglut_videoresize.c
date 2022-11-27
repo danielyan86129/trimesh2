@@ -25,8 +25,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#include <GL/freeglut.h>
 
 /*
  * NOTE: functions declared in this file probably will not be implemented.
@@ -34,17 +34,18 @@
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
-int  FGAPIENTRY glutVideoResizeGet( GLenum eWhat )            {    return( 0x00 );    }
-void FGAPIENTRY glutSetupVideoResizing( void )                { /* Not implemented */ }
-void FGAPIENTRY glutStopVideoResizing( void )                 { /* Not implemented */ }
-void FGAPIENTRY glutVideoResize( int x, int y, int w, int h ) { /* Not implemented */ }
-void FGAPIENTRY glutVideoPan( int x, int y, int w, int h )    { /* Not implemented */ }
+int FGAPIENTRY glutVideoResizeGet(GLenum eWhat) { return (0x00); }
+void FGAPIENTRY glutSetupVideoResizing(void)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutStopVideoResizing(void)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutVideoResize(int x, int y, int w, int h)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutVideoPan(int x, int y, int w, int h)
+{ /* Not implemented */
+}
 
 /*** END OF FILE ***/
-
-
-
-
-
-
-

@@ -26,11 +26,11 @@
  */
 
 #define FREEGLUT_BUILDING_LIB
-#include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#include <GL/freeglut.h>
 
 #if TARGET_HOST_POSIX_X11
-#include <limits.h>  /* LONG_MAX */
+#include <limits.h> /* LONG_MAX */
 #endif
 
 /*
@@ -56,57 +56,57 @@ SFG_Display fgDisplay;
 /*
  * The settings for the current freeglut session
  */
-SFG_State fgState = { { -1, -1, GL_FALSE },  /* Position */
-                      { 300, 300, GL_TRUE }, /* Size */
-                      GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH,  /* DisplayMode */
-                      GL_FALSE,              /* Initialised */
-                      GLUT_TRY_DIRECT_CONTEXT,  /* DirectContext */
-                      GL_FALSE,              /* ForceIconic */
-                      GL_FALSE,              /* UseCurrentContext */
-                      GL_FALSE,              /* GLDebugSwitch */
-                      GL_FALSE,              /* XSyncSwitch */
-                      GLUT_KEY_REPEAT_ON,    /* KeyRepeat */
-                      INVALID_MODIFIERS,     /* Modifiers */
-                      0,                     /* FPSInterval */
-                      0,                     /* SwapCount */
-                      0,                     /* SwapTime */
-                      0,                     /* Time */
-                      { NULL, NULL },         /* Timers */
-                      { NULL, NULL },         /* FreeTimers */
-                      NULL,                   /* IdleCallback */
-                      0,                      /* ActiveMenus */
-                      NULL,                   /* MenuStateCallback */
-                      NULL,                   /* MenuStatusCallback */
-                      { -1, -1, GL_TRUE },    /* GameModeSize */
-                      -1,                     /* GameModeDepth */
-                      -1,                     /* GameModeRefresh */
-                      GLUT_ACTION_EXIT,       /* ActionOnWindowClose */
-                      GLUT_EXEC_STATE_INIT,   /* ExecState */
-                      NULL,                   /* ProgramName */
-                      GL_FALSE,               /* JoysticksInitialised */
-                      0,                      /* NumActiveJoysticks */
-                      GL_FALSE,               /* InputDevsInitialised */
-                      0,                      /* MouseWheelTicks */
-                      1,                      /* AuxiliaryBufferNumber */
-                      4,                      /* SampleNumber */
-                      GL_FALSE,               /* SkipStaleMotion */
-                      1,                      /* MajorVersion */
-                      0,                      /* MinorVersion */
-                      0,                      /* ContextFlags */
-                      0,                      /* ContextProfile */
-                      NULL,                   /* ErrorFunc */
-                      NULL                    /* WarningFunc */
+SFG_State fgState = {
+    {-1, -1, GL_FALSE},                   /* Position */
+    {300, 300, GL_TRUE},                  /* Size */
+    GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH, /* DisplayMode */
+    GL_FALSE,                             /* Initialised */
+    GLUT_TRY_DIRECT_CONTEXT,              /* DirectContext */
+    GL_FALSE,                             /* ForceIconic */
+    GL_FALSE,                             /* UseCurrentContext */
+    GL_FALSE,                             /* GLDebugSwitch */
+    GL_FALSE,                             /* XSyncSwitch */
+    GLUT_KEY_REPEAT_ON,                   /* KeyRepeat */
+    INVALID_MODIFIERS,                    /* Modifiers */
+    0,                                    /* FPSInterval */
+    0,                                    /* SwapCount */
+    0,                                    /* SwapTime */
+    0,                                    /* Time */
+    {NULL, NULL},                         /* Timers */
+    {NULL, NULL},                         /* FreeTimers */
+    NULL,                                 /* IdleCallback */
+    0,                                    /* ActiveMenus */
+    NULL,                                 /* MenuStateCallback */
+    NULL,                                 /* MenuStatusCallback */
+    {-1, -1, GL_TRUE},                    /* GameModeSize */
+    -1,                                   /* GameModeDepth */
+    -1,                                   /* GameModeRefresh */
+    GLUT_ACTION_EXIT,                     /* ActionOnWindowClose */
+    GLUT_EXEC_STATE_INIT,                 /* ExecState */
+    NULL,                                 /* ProgramName */
+    GL_FALSE,                             /* JoysticksInitialised */
+    0,                                    /* NumActiveJoysticks */
+    GL_FALSE,                             /* InputDevsInitialised */
+    0,                                    /* MouseWheelTicks */
+    1,                                    /* AuxiliaryBufferNumber */
+    4,                                    /* SampleNumber */
+    GL_FALSE,                             /* SkipStaleMotion */
+    1,                                    /* MajorVersion */
+    0,                                    /* MinorVersion */
+    0,                                    /* ContextFlags */
+    0,                                    /* ContextProfile */
+    NULL,                                 /* ErrorFunc */
+    NULL                                  /* WarningFunc */
 };
-
 
 /* -- PRIVATE FUNCTIONS ---------------------------------------------------- */
 
 #if TARGET_HOST_POSIX_X11
 
 /* Return the atom associated with "name". */
-static Atom fghGetAtom(const char * name)
+static Atom fghGetAtom(const char* name)
 {
-  return XInternAtom(fgDisplay.Display, name, False);
+    return XInternAtom(fgDisplay.Display, name, False);
 }
 
 /*
@@ -115,197 +115,166 @@ static Atom fghGetAtom(const char * name)
  * number of elements in "data".  Return zero otherwise.  In both cases, use
  * "Xfree()" to free "data".
  */
-static int fghGetWindowProperty(Window window,
-				Atom property,
-				Atom type,
-				unsigned char ** data)
+static int fghGetWindowProperty(Window window, Atom property, Atom type,
+                                unsigned char** data)
 {
-  /*
-   * Caller always has to use "Xfree()" to free "data", since
-   * "XGetWindowProperty() always allocates one extra byte in prop_return
-   * [i.e. "data"] (even if the property is zero length) [..]".
-   */
+    /*
+     * Caller always has to use "Xfree()" to free "data", since
+     * "XGetWindowProperty() always allocates one extra byte in prop_return
+     * [i.e. "data"] (even if the property is zero length) [..]".
+     */
 
-  int status;  /*  Returned by "XGetWindowProperty". */
+    int status; /*  Returned by "XGetWindowProperty". */
 
-  Atom          type_returned;
-  int           temp_format;             /*  Not used. */
-  unsigned long number_of_elements;
-  unsigned long temp_bytes_after;        /*  Not used. */
+    Atom type_returned;
+    int temp_format; /*  Not used. */
+    unsigned long number_of_elements;
+    unsigned long temp_bytes_after; /*  Not used. */
 
+    status =
+        XGetWindowProperty(fgDisplay.Display, window, property, 0, LONG_MAX,
+                           False, type, &type_returned, &temp_format,
+                           &number_of_elements, &temp_bytes_after, data);
 
-  status = XGetWindowProperty(fgDisplay.Display,
-			      window,
-			      property,
-			      0,
-			      LONG_MAX,
-			      False,
-			      type,
-			      &type_returned,
-			      &temp_format,
-			      &number_of_elements,
-			      &temp_bytes_after,
-			      data);
+    FREEGLUT_INTERNAL_ERROR_EXIT(status == Success,
+                                 "XGetWindowProperty failled",
+                                 "fghGetWindowProperty");
 
-  FREEGLUT_INTERNAL_ERROR_EXIT(status == Success,
-			       "XGetWindowProperty failled",
-			       "fghGetWindowProperty");
-
-  if (type_returned != type)
+    if (type_returned != type)
     {
-      number_of_elements = 0;
+        number_of_elements = 0;
     }
 
-  return number_of_elements;
+    return number_of_elements;
 }
 
 /*  Check if the window manager is NET WM compliant. */
 static int fghNetWMSupported(void)
 {
-  Atom wm_check;
-  Window ** window_ptr_1;
+    Atom wm_check;
+    Window** window_ptr_1;
 
-  int number_of_windows;
-  int net_wm_supported;
+    int number_of_windows;
+    int net_wm_supported;
 
+    net_wm_supported = 0;
 
-  net_wm_supported = 0;
+    wm_check = fghGetAtom("_NET_SUPPORTING_WM_CHECK");
+    window_ptr_1 = malloc(sizeof(Window*));
 
-  wm_check = fghGetAtom("_NET_SUPPORTING_WM_CHECK");
-  window_ptr_1 = malloc(sizeof(Window *));
-
-  /*
-   * Check that the window manager has set this property on the root window.
-   * The property must be the ID of a child window.
-   */
-  number_of_windows = fghGetWindowProperty(fgDisplay.RootWindow,
-                                           wm_check,
-                                           XA_WINDOW,
-                                           (unsigned char **) window_ptr_1);
-  if (number_of_windows == 1)
+    /*
+     * Check that the window manager has set this property on the root window.
+     * The property must be the ID of a child window.
+     */
+    number_of_windows =
+        fghGetWindowProperty(fgDisplay.RootWindow, wm_check, XA_WINDOW,
+                             (unsigned char**)window_ptr_1);
+    if (number_of_windows == 1)
     {
-      Window ** window_ptr_2;
+        Window** window_ptr_2;
 
-      window_ptr_2 = malloc(sizeof(Window *));
+        window_ptr_2 = malloc(sizeof(Window*));
 
-      /* Check that the window has the same property set to the same value. */
-      number_of_windows = fghGetWindowProperty(**window_ptr_1,
-                                               wm_check,
-                                               XA_WINDOW,
-                                               (unsigned char **) window_ptr_2);
-      if ((number_of_windows == 1) && (**window_ptr_1 == **window_ptr_2))
-      {
-        /* NET WM compliant */
-        net_wm_supported = 1;
-      }
+        /* Check that the window has the same property set to the same value. */
+        number_of_windows = fghGetWindowProperty(
+            **window_ptr_1, wm_check, XA_WINDOW, (unsigned char**)window_ptr_2);
+        if ((number_of_windows == 1) && (**window_ptr_1 == **window_ptr_2))
+        {
+            /* NET WM compliant */
+            net_wm_supported = 1;
+        }
 
-      XFree(*window_ptr_2);
-      free(window_ptr_2);
+        XFree(*window_ptr_2);
+        free(window_ptr_2);
     }
 
-        XFree(*window_ptr_1);
-        free(window_ptr_1);
+    XFree(*window_ptr_1);
+    free(window_ptr_1);
 
-        return net_wm_supported;
+    return net_wm_supported;
 }
 
 /*  Check if "hint" is present in "property" for "window". */
 int fgHintPresent(Window window, Atom property, Atom hint)
 {
-  Atom *atoms;
-  int number_of_atoms;
-  int supported;
-  int i;
+    Atom* atoms;
+    int number_of_atoms;
+    int supported;
+    int i;
 
-  supported = 0;
+    supported = 0;
 
-  number_of_atoms = fghGetWindowProperty(window,
-					 property,
-					 XA_ATOM,
-					 (unsigned char **) &atoms);
-  for (i = 0; i < number_of_atoms; i++)
-  {
-      if (atoms[i] == hint)
-      {
-          supported = 1;
-          break;
-      }
-  }
+    number_of_atoms = fghGetWindowProperty(window, property, XA_ATOM,
+                                           (unsigned char**)&atoms);
+    for (i = 0; i < number_of_atoms; i++)
+    {
+        if (atoms[i] == hint)
+        {
+            supported = 1;
+            break;
+        }
+    }
 
-  XFree(atoms);
-  return supported;
+    XFree(atoms);
+    return supported;
 }
 
 #endif /*  TARGET_HOST_POSIX_X11  */
 
-
 /*
  * A call to this function should initialize all the display stuff...
  */
-static void fghInitialize( const char* displayName )
+static void fghInitialize(const char* displayName)
 {
 #if TARGET_HOST_POSIX_X11
-    fgDisplay.Display = XOpenDisplay( displayName );
+    fgDisplay.Display = XOpenDisplay(displayName);
 
-    if( fgDisplay.Display == NULL )
-        fgError( "failed to open display '%s'", XDisplayName( displayName ) );
+    if (fgDisplay.Display == NULL)
+        fgError("failed to open display '%s'", XDisplayName(displayName));
 
-    if( !glXQueryExtension( fgDisplay.Display, NULL, NULL ) )
-        fgError( "OpenGL GLX extension not supported by display '%s'",
-            XDisplayName( displayName ) );
+    if (!glXQueryExtension(fgDisplay.Display, NULL, NULL))
+        fgError("OpenGL GLX extension not supported by display '%s'",
+                XDisplayName(displayName));
 
-    fgDisplay.Screen = DefaultScreen( fgDisplay.Display );
-    fgDisplay.RootWindow = RootWindow(
-        fgDisplay.Display,
-        fgDisplay.Screen
-    );
+    fgDisplay.Screen = DefaultScreen(fgDisplay.Display);
+    fgDisplay.RootWindow = RootWindow(fgDisplay.Display, fgDisplay.Screen);
 
-    fgDisplay.ScreenWidth  = DisplayWidth(
-        fgDisplay.Display,
-        fgDisplay.Screen
-    );
-    fgDisplay.ScreenHeight = DisplayHeight(
-        fgDisplay.Display,
-        fgDisplay.Screen
-    );
+    fgDisplay.ScreenWidth = DisplayWidth(fgDisplay.Display, fgDisplay.Screen);
+    fgDisplay.ScreenHeight = DisplayHeight(fgDisplay.Display, fgDisplay.Screen);
 
-    fgDisplay.ScreenWidthMM = DisplayWidthMM(
-        fgDisplay.Display,
-        fgDisplay.Screen
-    );
-    fgDisplay.ScreenHeightMM = DisplayHeightMM(
-        fgDisplay.Display,
-        fgDisplay.Screen
-    );
+    fgDisplay.ScreenWidthMM =
+        DisplayWidthMM(fgDisplay.Display, fgDisplay.Screen);
+    fgDisplay.ScreenHeightMM =
+        DisplayHeightMM(fgDisplay.Display, fgDisplay.Screen);
 
-    fgDisplay.Connection = ConnectionNumber( fgDisplay.Display );
+    fgDisplay.Connection = ConnectionNumber(fgDisplay.Display);
 
     /* Create the window deletion atom */
     fgDisplay.DeleteWindow = fghGetAtom("WM_DELETE_WINDOW");
 
     /* Create the state and full screen atoms */
-    fgDisplay.State           = None;
+    fgDisplay.State = None;
     fgDisplay.StateFullScreen = None;
 
     if (fghNetWMSupported())
     {
-      const Atom supported = fghGetAtom("_NET_SUPPORTED");
-      const Atom state     = fghGetAtom("_NET_WM_STATE");
-      
-      /* Check if the state hint is supported. */
-      if (fgHintPresent(fgDisplay.RootWindow, supported, state))
-      {
-        const Atom full_screen = fghGetAtom("_NET_WM_STATE_FULLSCREEN");
-        
-        fgDisplay.State = state;
-        
-        /* Check if the window manager supports full screen. */
-        /**  Check "_NET_WM_ALLOWED_ACTIONS" on our window instead? **/
-        if (fgHintPresent(fgDisplay.RootWindow, supported, full_screen))
+        const Atom supported = fghGetAtom("_NET_SUPPORTED");
+        const Atom state = fghGetAtom("_NET_WM_STATE");
+
+        /* Check if the state hint is supported. */
+        if (fgHintPresent(fgDisplay.RootWindow, supported, state))
         {
-          fgDisplay.StateFullScreen = full_screen;
+            const Atom full_screen = fghGetAtom("_NET_WM_STATE_FULLSCREEN");
+
+            fgDisplay.State = state;
+
+            /* Check if the window manager supports full screen. */
+            /**  Check "_NET_WM_ALLOWED_ACTIONS" on our window instead? **/
+            if (fgHintPresent(fgDisplay.RootWindow, supported, full_screen))
+            {
+                fgDisplay.StateFullScreen = full_screen;
+            }
         }
-      }
     }
 
 #elif TARGET_HOST_MS_WINDOWS
@@ -313,14 +282,15 @@ static void fghInitialize( const char* displayName )
     WNDCLASS wc;
     ATOM atom;
 
-    /* What we need to do is to initialize the fgDisplay global structure here. */
-    fgDisplay.Instance = GetModuleHandle( NULL );
-    fgDisplay.DisplayName= displayName ? strdup(displayName) : 0 ;
-    atom = GetClassInfo( fgDisplay.Instance, _T("FREEGLUT"), &wc );
+    /* What we need to do is to initialize the fgDisplay global structure here.
+     */
+    fgDisplay.Instance = GetModuleHandle(NULL);
+    fgDisplay.DisplayName = displayName ? strdup(displayName) : 0;
+    atom = GetClassInfo(fgDisplay.Instance, _T("FREEGLUT"), &wc);
 
-    if( atom == 0 )
+    if (atom == 0)
     {
-        ZeroMemory( &wc, sizeof(WNDCLASS) );
+        ZeroMemory(&wc, sizeof(WNDCLASS));
 
         /*
          * Each of the windows should have its own device context, and we
@@ -330,63 +300,64 @@ static void fghInitialize( const char* displayName )
          * XXX Old code had "| CS_DBCLCKS" commented out.  Plans for the
          * XXX future?  Dead-end idea?
          */
-        wc.lpfnWndProc    = fgWindowProc;
-        wc.cbClsExtra     = 0;
-        wc.cbWndExtra     = 0;
-        wc.hInstance      = fgDisplay.Instance;
-        wc.hIcon          = LoadIcon( fgDisplay.Instance, _T("GLUT_ICON") );
+        wc.lpfnWndProc = fgWindowProc;
+        wc.cbClsExtra = 0;
+        wc.cbWndExtra = 0;
+        wc.hInstance = fgDisplay.Instance;
+        wc.hIcon = LoadIcon(fgDisplay.Instance, _T("GLUT_ICON"));
 
 #if defined(_WIN32_WCE)
-        wc.style          = CS_HREDRAW | CS_VREDRAW;
+        wc.style = CS_HREDRAW | CS_VREDRAW;
 #else
-        wc.style          = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+        wc.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         if (!wc.hIcon)
-          wc.hIcon        = LoadIcon( NULL, IDI_WINLOGO );
+            wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 #endif
 
-        wc.hCursor        = LoadCursor( NULL, IDC_ARROW );
-        wc.hbrBackground  = NULL;
-        wc.lpszMenuName   = NULL;
-        wc.lpszClassName  = _T("FREEGLUT");
+        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.hbrBackground = NULL;
+        wc.lpszMenuName = NULL;
+        wc.lpszClassName = _T("FREEGLUT");
 
         /* Register the window class */
-        atom = RegisterClass( &wc );
-        FREEGLUT_INTERNAL_ERROR_EXIT ( atom, "Window Class Not Registered", "fghInitialize" );
+        atom = RegisterClass(&wc);
+        FREEGLUT_INTERNAL_ERROR_EXIT(atom, "Window Class Not Registered",
+                                     "fghInitialize");
     }
 
     /* The screen dimensions can be obtained via GetSystemMetrics() calls */
-    fgDisplay.ScreenWidth  = GetSystemMetrics( SM_CXSCREEN );
-    fgDisplay.ScreenHeight = GetSystemMetrics( SM_CYSCREEN );
+    fgDisplay.ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+    fgDisplay.ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 
     {
-        HWND desktop = GetDesktopWindow( );
-        HDC  context = GetDC( desktop );
+        HWND desktop = GetDesktopWindow();
+        HDC context = GetDC(desktop);
 
-        fgDisplay.ScreenWidthMM  = GetDeviceCaps( context, HORZSIZE );
-        fgDisplay.ScreenHeightMM = GetDeviceCaps( context, VERTSIZE );
+        fgDisplay.ScreenWidthMM = GetDeviceCaps(context, HORZSIZE);
+        fgDisplay.ScreenHeightMM = GetDeviceCaps(context, VERTSIZE);
 
-        ReleaseDC( desktop, context );
+        ReleaseDC(desktop, context);
     }
     /* If we have a DisplayName try to use it for metrics */
-    if( fgDisplay.DisplayName )
+    if (fgDisplay.DisplayName)
     {
-        HDC context = CreateDC(fgDisplay.DisplayName,0,0,0);
-        if( context )
+        HDC context = CreateDC(fgDisplay.DisplayName, 0, 0, 0);
+        if (context)
         {
-	    fgDisplay.ScreenWidth  = GetDeviceCaps( context, HORZRES );
-	    fgDisplay.ScreenHeight = GetDeviceCaps( context, VERTRES );
-	    fgDisplay.ScreenWidthMM  = GetDeviceCaps( context, HORZSIZE );
-	    fgDisplay.ScreenHeightMM = GetDeviceCaps( context, VERTSIZE );
-	    DeleteDC(context);
+            fgDisplay.ScreenWidth = GetDeviceCaps(context, HORZRES);
+            fgDisplay.ScreenHeight = GetDeviceCaps(context, VERTRES);
+            fgDisplay.ScreenWidthMM = GetDeviceCaps(context, HORZSIZE);
+            fgDisplay.ScreenHeightMM = GetDeviceCaps(context, VERTSIZE);
+            DeleteDC(context);
         }
         else
-	    fgWarning("fghInitialize: "
-		      "CreateDC failed, Screen size info may be incorrect\n"
-          "This is quite likely caused by a bad '-display' parameter");
-      
+            fgWarning(
+                "fghInitialize: "
+                "CreateDC failed, Screen size info may be incorrect\n"
+                "This is quite likely caused by a bad '-display' parameter");
     }
     /* Set the timer granularity to 1 ms */
-    timeBeginPeriod ( 1 );
+    timeBeginPeriod(1);
 
 #endif
 
@@ -397,7 +368,7 @@ static void fghInitialize( const char* displayName )
      * Any cleanup isn't needed on Windows anyway, the OS takes care of it.c
      * see: http://blogs.msdn.com/b/oldnewthing/archive/2012/01/05/10253268.aspx
      */
-#if ( TARGET_HOST_MS_WINDOWS == 0 )
+#if (TARGET_HOST_MS_WINDOWS == 0)
     atexit(fgDeinitialize);
 #endif
 
@@ -408,56 +379,57 @@ static void fghInitialize( const char* displayName )
 /*
  * Perform the freeglut deinitialization...
  */
-void fgDeinitialize( void )
+void fgDeinitialize(void)
 {
-    SFG_Timer *timer;
+    SFG_Timer* timer;
 
-    if( !fgState.Initialised )
+    if (!fgState.Initialised)
     {
         return;
     }
 
-	/* If we're in game mode, we want to leave game mode */
-    if( fgStructure.GameModeWindow ) {
+    /* If we're in game mode, we want to leave game mode */
+    if (fgStructure.GameModeWindow)
+    {
         glutLeaveGameMode();
     }
 
     /* If there was a menu created, destroy the rendering context */
-    if( fgStructure.MenuContext )
+    if (fgStructure.MenuContext)
     {
 #if TARGET_HOST_POSIX_X11
         /* Note that the MVisualInfo is not owned by the MenuContext! */
-        glXDestroyContext( fgDisplay.Display, fgStructure.MenuContext->MContext );
+        glXDestroyContext(fgDisplay.Display, fgStructure.MenuContext->MContext);
 #endif
-        free( fgStructure.MenuContext );
+        free(fgStructure.MenuContext);
         fgStructure.MenuContext = NULL;
     }
 
-    fgDestroyStructure( );
+    fgDestroyStructure();
 
-    while( ( timer = fgState.Timers.First) )
+    while ((timer = fgState.Timers.First))
     {
-        fgListRemove( &fgState.Timers, &timer->Node );
-        free( timer );
+        fgListRemove(&fgState.Timers, &timer->Node);
+        free(timer);
     }
 
-    while( ( timer = fgState.FreeTimers.First) )
+    while ((timer = fgState.FreeTimers.First))
     {
-        fgListRemove( &fgState.FreeTimers, &timer->Node );
-        free( timer );
+        fgListRemove(&fgState.FreeTimers, &timer->Node);
+        free(timer);
     }
 
 #if !defined(_WIN32_WCE)
-    if ( fgState.JoysticksInitialised )
-        fgJoystickClose( );
+    if (fgState.JoysticksInitialised)
+        fgJoystickClose();
 
-    if ( fgState.InputDevsInitialised )
-        fgInputDeviceClose( );
+    if (fgState.InputDevsInitialised)
+        fgInputDeviceClose();
 #endif /* !defined(_WIN32_WCE) */
     fgState.JoysticksInitialised = GL_FALSE;
     fgState.InputDevsInitialised = GL_FALSE;
 
-	fgState.MouseWheelTicks = 0;
+    fgState.MouseWheelTicks = 0;
 
     fgState.MajorVersion = 1;
     fgState.MinorVersion = 0;
@@ -476,36 +448,36 @@ void fgDeinitialize( void )
 
     fgState.DisplayMode = GLUT_RGBA | GLUT_SINGLE | GLUT_DEPTH;
 
-    fgState.DirectContext  = GLUT_TRY_DIRECT_CONTEXT;
-    fgState.ForceIconic         = GL_FALSE;
-    fgState.UseCurrentContext   = GL_FALSE;
-    fgState.GLDebugSwitch       = GL_FALSE;
-    fgState.XSyncSwitch         = GL_FALSE;
+    fgState.DirectContext = GLUT_TRY_DIRECT_CONTEXT;
+    fgState.ForceIconic = GL_FALSE;
+    fgState.UseCurrentContext = GL_FALSE;
+    fgState.GLDebugSwitch = GL_FALSE;
+    fgState.XSyncSwitch = GL_FALSE;
     fgState.ActionOnWindowClose = GLUT_ACTION_EXIT;
-    fgState.ExecState           = GLUT_EXEC_STATE_INIT;
+    fgState.ExecState = GLUT_EXEC_STATE_INIT;
 
-    fgState.KeyRepeat       = GLUT_KEY_REPEAT_ON;
-    fgState.Modifiers       = INVALID_MODIFIERS;
+    fgState.KeyRepeat = GLUT_KEY_REPEAT_ON;
+    fgState.Modifiers = INVALID_MODIFIERS;
 
-    fgState.GameModeSize.X  = -1;
-    fgState.GameModeSize.Y  = -1;
-    fgState.GameModeDepth   = -1;
+    fgState.GameModeSize.X = -1;
+    fgState.GameModeSize.Y = -1;
+    fgState.GameModeDepth = -1;
     fgState.GameModeRefresh = -1;
 
-    fgListInit( &fgState.Timers );
-    fgListInit( &fgState.FreeTimers );
+    fgListInit(&fgState.Timers);
+    fgListInit(&fgState.FreeTimers);
 
     fgState.IdleCallback = NULL;
-    fgState.MenuStateCallback = ( FGCBMenuState )NULL;
-    fgState.MenuStatusCallback = ( FGCBMenuStatus )NULL;
+    fgState.MenuStateCallback = (FGCBMenuState)NULL;
+    fgState.MenuStatusCallback = (FGCBMenuStatus)NULL;
 
-    fgState.SwapCount   = 0;
-    fgState.SwapTime    = 0;
+    fgState.SwapCount = 0;
+    fgState.SwapTime = 0;
     fgState.FPSInterval = 0;
 
-    if( fgState.ProgramName )
+    if (fgState.ProgramName)
     {
-        free( fgState.ProgramName );
+        free(fgState.ProgramName);
         fgState.ProgramName = NULL;
     }
 
@@ -515,23 +487,23 @@ void fgDeinitialize( void )
      * Make sure all X-client data we have created will be destroyed on
      * display closing
      */
-    XSetCloseDownMode( fgDisplay.Display, DestroyAll );
+    XSetCloseDownMode(fgDisplay.Display, DestroyAll);
 
     /*
      * Close the display connection, destroying all windows we have
      * created so far
      */
-    XCloseDisplay( fgDisplay.Display );
+    XCloseDisplay(fgDisplay.Display);
 
 #elif TARGET_HOST_MS_WINDOWS
-    if( fgDisplay.DisplayName )
+    if (fgDisplay.DisplayName)
     {
-        free( fgDisplay.DisplayName );
+        free(fgDisplay.DisplayName);
         fgDisplay.DisplayName = NULL;
     }
 
     /* Reset the timer granularity */
-    timeEndPeriod ( 1 );
+    timeEndPeriod(1);
 
 #endif
 
@@ -572,14 +544,14 @@ from The Open Group.
 
 */
 
-#define NoValue         0x0000
-#define XValue          0x0001
-#define YValue          0x0002
-#define WidthValue      0x0004
-#define HeightValue     0x0008
-#define AllValues       0x000F
-#define XNegative       0x0010
-#define YNegative       0x0020
+#define NoValue 0x0000
+#define XValue 0x0001
+#define YValue 0x0002
+#define WidthValue 0x0004
+#define HeightValue 0x0008
+#define AllValues 0x000F
+#define XNegative 0x0010
+#define YNegative 0x0020
 
 /*
  *    XParseGeometry parses strings of the form
@@ -593,8 +565,7 @@ from The Open Group.
  *   not found, the corresponding argument is left unchanged.
  */
 
-static int
-ReadInteger(char *string, char **NextString)
+static int ReadInteger(char* string, char** NextString)
 {
     register int Result = 0;
     int Sign = 1;
@@ -617,26 +588,24 @@ ReadInteger(char *string, char **NextString)
         return -Result;
 }
 
-static int XParseGeometry (
-    const char *string,
-    int *x,
-    int *y,
-    unsigned int *width,    /* RETURN */
-    unsigned int *height)    /* RETURN */
+static int XParseGeometry(const char* string, int* x, int* y,
+                          unsigned int* width,  /* RETURN */
+                          unsigned int* height) /* RETURN */
 {
     int mask = NoValue;
-    register char *strind;
+    register char* strind;
     unsigned int tempWidth = 0, tempHeight = 0;
     int tempX = 0, tempY = 0;
-    char *nextCharacter;
+    char* nextCharacter;
 
-    if ( (string == NULL) || (*string == '\0'))
-      return mask;
+    if ((string == NULL) || (*string == '\0'))
+        return mask;
     if (*string == '=')
-        string++;  /* ignore possible '=' at beg of geometry spec */
+        string++; /* ignore possible '=' at beg of geometry spec */
 
-    strind = (char *)string;
-    if (*strind != '+' && *strind != '-' && *strind != 'x') {
+    strind = (char*)string;
+    if (*strind != '+' && *strind != '-' && *strind != 'x')
+    {
         tempWidth = ReadInteger(strind, &nextCharacter);
         if (strind == nextCharacter)
             return 0;
@@ -644,7 +613,8 @@ static int XParseGeometry (
         mask |= WidthValue;
     }
 
-    if (*strind == 'x' || *strind == 'X') {
+    if (*strind == 'x' || *strind == 'X')
+    {
         strind++;
         tempHeight = ReadInteger(strind, &nextCharacter);
         if (strind == nextCharacter)
@@ -653,8 +623,10 @@ static int XParseGeometry (
         mask |= HeightValue;
     }
 
-    if ((*strind == '+') || (*strind == '-')) {
-        if (*strind == '-') {
+    if ((*strind == '+') || (*strind == '-'))
+    {
+        if (*strind == '-')
+        {
             strind++;
             tempX = -ReadInteger(strind, &nextCharacter);
             if (strind == nextCharacter)
@@ -671,8 +643,10 @@ static int XParseGeometry (
             strind = nextCharacter;
         }
         mask |= XValue;
-        if ((*strind == '+') || (*strind == '-')) {
-            if (*strind == '-') {
+        if ((*strind == '+') || (*strind == '-'))
+        {
+            if (*strind == '-')
+            {
                 strind++;
                 tempY = -ReadInteger(strind, &nextCharacter);
                 if (strind == nextCharacter)
@@ -695,7 +669,8 @@ static int XParseGeometry (
     /* If strind isn't at the end of the string the it's an invalid
        geometry specification. */
 
-    if (*strind != '\0') return 0;
+    if (*strind != '\0')
+        return 0;
 
     if (mask & XValue)
         *x = tempX;
@@ -715,24 +690,24 @@ static int XParseGeometry (
  * Perform initialization. This usually happens on the program startup
  * and restarting after glutMainLoop termination...
  */
-void FGAPIENTRY glutInit( int* pargc, char** argv )
+void FGAPIENTRY glutInit(int* pargc, char** argv)
 {
     char* displayName = NULL;
     char* geometry = NULL;
     int i, j, argc = *pargc;
 
-    if( fgState.Initialised )
-        fgError( "illegal glutInit() reinitialization attempt" );
+    if (fgState.Initialised)
+        fgError("illegal glutInit() reinitialization attempt");
 
     if (pargc && *pargc && argv && *argv && **argv)
     {
-        fgState.ProgramName = strdup (*argv);
+        fgState.ProgramName = strdup(*argv);
 
-        if( !fgState.ProgramName )
-            fgError ("Could not allocate space for the program's name.");
+        if (!fgState.ProgramName)
+            fgError("Could not allocate space for the program's name.");
     }
 
-    fgCreateStructure( );
+    fgCreateStructure();
 
     /* Get start time */
     fgState.Time = fgSystemTime();
@@ -740,95 +715,95 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
     /* check if GLUT_FPS env var is set */
 #ifndef _WIN32_WCE
     {
-        const char *fps = getenv( "GLUT_FPS" );
+        const char* fps = getenv("GLUT_FPS");
 
-        if( fps )
+        if (fps)
         {
             int interval;
-            sscanf( fps, "%d", &interval );
+            sscanf(fps, "%d", &interval);
 
-            if( interval <= 0 )
-                fgState.FPSInterval = 5000;  /* 5000 millisecond default */
+            if (interval <= 0)
+                fgState.FPSInterval = 5000; /* 5000 millisecond default */
             else
                 fgState.FPSInterval = interval;
         }
     }
 
-    displayName = getenv( "DISPLAY" );
+    displayName = getenv("DISPLAY");
 
-    for( i = 1; i < argc; i++ )
+    for (i = 1; i < argc; i++)
     {
-        if( strcmp( argv[ i ], "-display" ) == 0 )
+        if (strcmp(argv[i], "-display") == 0)
         {
-            if( ++i >= argc )
-                fgError( "-display parameter must be followed by display name" );
+            if (++i >= argc)
+                fgError("-display parameter must be followed by display name");
 
-            displayName = argv[ i ];
+            displayName = argv[i];
 
-            argv[ i - 1 ] = NULL;
-            argv[ i     ] = NULL;
-            ( *pargc ) -= 2;
+            argv[i - 1] = NULL;
+            argv[i] = NULL;
+            (*pargc) -= 2;
         }
-        else if( strcmp( argv[ i ], "-geometry" ) == 0 )
+        else if (strcmp(argv[i], "-geometry") == 0)
         {
-            if( ++i >= argc )
-                fgError( "-geometry parameter must be followed by window "
-                         "geometry settings" );
+            if (++i >= argc)
+                fgError("-geometry parameter must be followed by window "
+                        "geometry settings");
 
-            geometry = argv[ i ];
+            geometry = argv[i];
 
-            argv[ i - 1 ] = NULL;
-            argv[ i     ] = NULL;
-            ( *pargc ) -= 2;
+            argv[i - 1] = NULL;
+            argv[i] = NULL;
+            (*pargc) -= 2;
         }
-        else if( strcmp( argv[ i ], "-direct" ) == 0)
+        else if (strcmp(argv[i], "-direct") == 0)
         {
-            if( fgState.DirectContext == GLUT_FORCE_INDIRECT_CONTEXT )
-                fgError( "parameters ambiguity, -direct and -indirect "
-                    "cannot be both specified" );
+            if (fgState.DirectContext == GLUT_FORCE_INDIRECT_CONTEXT)
+                fgError("parameters ambiguity, -direct and -indirect "
+                        "cannot be both specified");
 
             fgState.DirectContext = GLUT_FORCE_DIRECT_CONTEXT;
-            argv[ i ] = NULL;
-            ( *pargc )--;
-        }
-        else if( strcmp( argv[ i ], "-indirect" ) == 0 )
-        {
-            if( fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT )
-                fgError( "parameters ambiguity, -direct and -indirect "
-                    "cannot be both specified" );
-
-            fgState.DirectContext = GLUT_FORCE_INDIRECT_CONTEXT;
-            argv[ i ] = NULL;
+            argv[i] = NULL;
             (*pargc)--;
         }
-        else if( strcmp( argv[ i ], "-iconic" ) == 0 )
+        else if (strcmp(argv[i], "-indirect") == 0)
+        {
+            if (fgState.DirectContext == GLUT_FORCE_DIRECT_CONTEXT)
+                fgError("parameters ambiguity, -direct and -indirect "
+                        "cannot be both specified");
+
+            fgState.DirectContext = GLUT_FORCE_INDIRECT_CONTEXT;
+            argv[i] = NULL;
+            (*pargc)--;
+        }
+        else if (strcmp(argv[i], "-iconic") == 0)
         {
             fgState.ForceIconic = GL_TRUE;
-            argv[ i ] = NULL;
-            ( *pargc )--;
+            argv[i] = NULL;
+            (*pargc)--;
         }
-        else if( strcmp( argv[ i ], "-gldebug" ) == 0 )
+        else if (strcmp(argv[i], "-gldebug") == 0)
         {
             fgState.GLDebugSwitch = GL_TRUE;
-            argv[ i ] = NULL;
-            ( *pargc )--;
+            argv[i] = NULL;
+            (*pargc)--;
         }
-        else if( strcmp( argv[ i ], "-sync" ) == 0 )
+        else if (strcmp(argv[i], "-sync") == 0)
         {
             fgState.XSyncSwitch = GL_TRUE;
-            argv[ i ] = NULL;
-            ( *pargc )--;
+            argv[i] = NULL;
+            (*pargc)--;
         }
     }
 
     /* Compact {argv}. */
-    for( i = j = 1; i < *pargc; i++, j++ )
+    for (i = j = 1; i < *pargc; i++, j++)
     {
         /* Guaranteed to end because there are "*pargc" arguments left */
-        while ( argv[ j ] == NULL )
+        while (argv[j] == NULL)
             j++;
-        if ( i != j )
-            argv[ i ] = argv[ j ];
+        if (i != j)
+            argv[i] = argv[j];
     }
 
 #endif /* _WIN32_WCE */
@@ -838,66 +813,64 @@ void FGAPIENTRY glutInit( int* pargc, char** argv )
      * in the program arguments, we will use the DISPLAY environment
      * variable for opening the X display (see code above):
      */
-    fghInitialize( displayName );
+    fghInitialize(displayName);
 
     /*
      * Geometry parsing deffered until here because we may need the screen
      * size.
      */
 
-    if (geometry )
+    if (geometry)
     {
         unsigned int parsedWidth = 0, parsedHeight = 0;
-        int mask = XParseGeometry( geometry,
-                                   &fgState.Position.X, &fgState.Position.Y,
-                                   &parsedWidth, &parsedHeight );
+        int mask =
+            XParseGeometry(geometry, &fgState.Position.X, &fgState.Position.Y,
+                           &parsedWidth, &parsedHeight);
         /* TODO: Check for overflow? */
-	if (parsedWidth != 0)
-		fgState.Size.X = parsedWidth;
-	if (parsedHeight != 0)
-		fgState.Size.Y = parsedHeight;
+        if (parsedWidth != 0)
+            fgState.Size.X = parsedWidth;
+        if (parsedHeight != 0)
+            fgState.Size.Y = parsedHeight;
 
-        if( (mask & (WidthValue|HeightValue)) == (WidthValue|HeightValue) )
+        if ((mask & (WidthValue | HeightValue)) == (WidthValue | HeightValue))
             fgState.Size.Use = GL_TRUE;
 
-        if( mask & XNegative )
+        if (mask & XNegative)
             fgState.Position.X += fgDisplay.ScreenWidth - fgState.Size.X;
 
-        if( mask & YNegative )
+        if (mask & YNegative)
             fgState.Position.Y += fgDisplay.ScreenHeight - fgState.Size.Y;
 
-        if( (mask & (XValue|YValue)) == (XValue|YValue) )
+        if ((mask & (XValue | YValue)) == (XValue | YValue))
             fgState.Position.Use = GL_TRUE;
     }
 }
 
 #if TARGET_HOST_MS_WINDOWS
-void (__cdecl *__glutExitFunc)( int return_value ) = NULL;
+void(__cdecl* __glutExitFunc)(int return_value) = NULL;
 
-void FGAPIENTRY __glutInitWithExit( int *pargc, char **argv, void (__cdecl *exit_function)(int) )
+void FGAPIENTRY __glutInitWithExit(int* pargc, char** argv,
+                                   void(__cdecl* exit_function)(int))
 {
-  __glutExitFunc = exit_function;
-  glutInit(pargc, argv);
+    __glutExitFunc = exit_function;
+    glutInit(pargc, argv);
 }
 #endif
 
 /*
  * Undoes all the "glutInit" stuff
  */
-void FGAPIENTRY glutExit ( void )
-{
-  fgDeinitialize ();
-}
+void FGAPIENTRY glutExit(void) { fgDeinitialize(); }
 
 /*
  * Sets the default initial window position for new windows
  */
-void FGAPIENTRY glutInitWindowPosition( int x, int y )
+void FGAPIENTRY glutInitWindowPosition(int x, int y)
 {
     fgState.Position.X = x;
     fgState.Position.Y = y;
 
-    if( ( x >= 0 ) && ( y >= 0 ) )
+    if ((x >= 0) && (y >= 0))
         fgState.Position.Use = GL_TRUE;
     else
         fgState.Position.Use = GL_FALSE;
@@ -906,12 +879,12 @@ void FGAPIENTRY glutInitWindowPosition( int x, int y )
 /*
  * Sets the default initial window size for new windows
  */
-void FGAPIENTRY glutInitWindowSize( int width, int height )
+void FGAPIENTRY glutInitWindowSize(int width, int height)
 {
     fgState.Size.X = width;
     fgState.Size.Y = height;
 
-    if( ( width > 0 ) && ( height > 0 ) )
+    if ((width > 0) && (height > 0))
         fgState.Size.Use = GL_TRUE;
     else
         fgState.Size.Use = GL_FALSE;
@@ -920,223 +893,230 @@ void FGAPIENTRY glutInitWindowSize( int width, int height )
 /*
  * Sets the default display mode for all new windows
  */
-void FGAPIENTRY glutInitDisplayMode( unsigned int displayMode )
+void FGAPIENTRY glutInitDisplayMode(unsigned int displayMode)
 {
     /* We will make use of this value when creating a new OpenGL context... */
     fgState.DisplayMode = displayMode;
 }
 
-
 /* -- INIT DISPLAY STRING PARSING ------------------------------------------ */
 
-static char* Tokens[] =
-{
-    "alpha", "acca", "acc", "blue", "buffer", "conformant", "depth", "double",
-    "green", "index", "num", "red", "rgba", "rgb", "luminance", "stencil",
-    "single", "stereo", "samples", "slow", "win32pdf", "win32pfd", "xvisual",
-    "xstaticgray", "xgrayscale", "xstaticcolor", "xpseudocolor",
-    "xtruecolor", "xdirectcolor",
-    "xstaticgrey", "xgreyscale", "xstaticcolour", "xpseudocolour",
-    "xtruecolour", "xdirectcolour", "borderless", "aux"
-};
-#define NUM_TOKENS             (int)(sizeof(Tokens) / sizeof(*Tokens))
+static char* Tokens[] = {"alpha",       "acca",          "acc",
+                         "blue",        "buffer",        "conformant",
+                         "depth",       "double",        "green",
+                         "index",       "num",           "red",
+                         "rgba",        "rgb",           "luminance",
+                         "stencil",     "single",        "stereo",
+                         "samples",     "slow",          "win32pdf",
+                         "win32pfd",    "xvisual",       "xstaticgray",
+                         "xgrayscale",  "xstaticcolor",  "xpseudocolor",
+                         "xtruecolor",  "xdirectcolor",  "xstaticgrey",
+                         "xgreyscale",  "xstaticcolour", "xpseudocolour",
+                         "xtruecolour", "xdirectcolour", "borderless",
+                         "aux"};
+#define NUM_TOKENS (int)(sizeof(Tokens) / sizeof(*Tokens))
 
-void FGAPIENTRY glutInitDisplayString( const char* displayMode )
+void FGAPIENTRY glutInitDisplayString(const char* displayMode)
 {
-    int glut_state_flag = 0 ;
+    int glut_state_flag = 0;
     /*
      * Unpack a lot of options from a character string.  The options are
      * delimited by blanks or tabs.
      */
-    char *token ;
-    size_t len = strlen ( displayMode );
-    char *buffer = (char *)malloc ( (len+1) * sizeof(char) );
-    memcpy ( buffer, displayMode, len );
+    char* token;
+    size_t len = strlen(displayMode);
+    char* buffer = (char*)malloc((len + 1) * sizeof(char));
+    memcpy(buffer, displayMode, len);
     buffer[len] = '\0';
 
-    token = strtok ( buffer, " \t" );
+    token = strtok(buffer, " \t");
 
-    while ( token )
+    while (token)
     {
         /* Process this token */
-        int i ;
+        int i;
 
         /* Temporary fix:  Ignore any length specifications and at least
          * process the basic token
          * TODO:  Fix this permanently
          */
-        size_t cleanlength = strcspn ( token, "=<>~!" );
+        size_t cleanlength = strcspn(token, "=<>~!");
 
-        for ( i = 0; i < NUM_TOKENS; i++ )
+        for (i = 0; i < NUM_TOKENS; i++)
         {
-            if ( strncmp ( token, Tokens[i], cleanlength ) == 0 ) break ;
+            if (strncmp(token, Tokens[i], cleanlength) == 0)
+                break;
         }
 
-        switch ( i )
+        switch (i)
         {
-        case 0 :  /* "alpha":  Alpha color buffer precision in bits */
-            glut_state_flag |= GLUT_ALPHA ;  /* Somebody fix this for me! */
-            break ;
+            case 0: /* "alpha":  Alpha color buffer precision in bits */
+                glut_state_flag |= GLUT_ALPHA; /* Somebody fix this for me! */
+                break;
 
-        case 1 :  /* "acca":  Red, green, blue, and alpha accumulation buffer
-                     precision in bits */
-            break ;
+            case 1: /* "acca":  Red, green, blue, and alpha accumulation buffer
+                       precision in bits */
+                break;
 
-        case 2 :  /* "acc":  Red, green, and blue accumulation buffer precision
-                     in bits with zero bits alpha */
-            glut_state_flag |= GLUT_ACCUM ;  /* Somebody fix this for me! */
-            break ;
+            case 2: /* "acc":  Red, green, and blue accumulation buffer
+                       precision in bits with zero bits alpha */
+                glut_state_flag |= GLUT_ACCUM; /* Somebody fix this for me! */
+                break;
 
-        case 3 :  /* "blue":  Blue color buffer precision in bits */
-            break ;
+            case 3: /* "blue":  Blue color buffer precision in bits */
+                break;
 
-        case 4 :  /* "buffer":  Number of bits in the color index color buffer
-                   */
-            break ;
+            case 4: /* "buffer":  Number of bits in the color index color buffer
+                     */
+                break;
 
-        case 5 :  /* "conformant":  Boolean indicating if the frame buffer
-                     configuration is conformant or not */
-            break ;
+            case 5: /* "conformant":  Boolean indicating if the frame buffer
+                       configuration is conformant or not */
+                break;
 
-        case 6 : /* "depth":  Number of bits of precsion in the depth buffer */
-            glut_state_flag |= GLUT_DEPTH ;  /* Somebody fix this for me! */
-            break ;
+            case 6: /* "depth":  Number of bits of precsion in the depth buffer
+                     */
+                glut_state_flag |= GLUT_DEPTH; /* Somebody fix this for me! */
+                break;
 
-        case 7 :  /* "double":  Boolean indicating if the color buffer is
-                     double buffered */
-            glut_state_flag |= GLUT_DOUBLE ;
-            break ;
+            case 7: /* "double":  Boolean indicating if the color buffer is
+                       double buffered */
+                glut_state_flag |= GLUT_DOUBLE;
+                break;
 
-        case 8 :  /* "green":  Green color buffer precision in bits */
-            break ;
+            case 8: /* "green":  Green color buffer precision in bits */
+                break;
 
-        case 9 :  /* "index":  Boolean if the color model is color index or not
-                   */
-            glut_state_flag |= GLUT_INDEX ;
-            break ;
+            case 9: /* "index":  Boolean if the color model is color index or
+                     * not
+                     */
+                glut_state_flag |= GLUT_INDEX;
+                break;
 
-        case 10 :  /* "num":  A special capability  name indicating where the
-                      value represents the Nth frame buffer configuration
-                      matching the description string */
-            break ;
+            case 10: /* "num":  A special capability  name indicating where the
+                        value represents the Nth frame buffer configuration
+                        matching the description string */
+                break;
 
-        case 11 :  /* "red":  Red color buffer precision in bits */
-            break ;
+            case 11: /* "red":  Red color buffer precision in bits */
+                break;
 
-        case 12 :  /* "rgba":  Number of bits of red, green, blue, and alpha in
-                      the RGBA color buffer */
-            glut_state_flag |= GLUT_RGBA ;  /* Somebody fix this for me! */
-            break ;
+            case 12: /* "rgba":  Number of bits of red, green, blue, and alpha
+                        in the RGBA color buffer */
+                glut_state_flag |= GLUT_RGBA; /* Somebody fix this for me! */
+                break;
 
-        case 13 :  /* "rgb":  Number of bits of red, green, and blue in the
-                      RGBA color buffer with zero bits alpha */
-            glut_state_flag |= GLUT_RGB ;  /* Somebody fix this for me! */
-            break ;
+            case 13: /* "rgb":  Number of bits of red, green, and blue in the
+                        RGBA color buffer with zero bits alpha */
+                glut_state_flag |= GLUT_RGB; /* Somebody fix this for me! */
+                break;
 
-        case 14 :  /* "luminance":  Number of bits of red in the RGBA and zero
-                      bits of green, blue (alpha not specified) of color buffer
-                      precision */
-            glut_state_flag |= GLUT_LUMINANCE ; /* Somebody fix this for me! */
-            break ;
+            case 14: /* "luminance":  Number of bits of red in the RGBA and zero
+                        bits of green, blue (alpha not specified) of color
+                        buffer precision */
+                glut_state_flag |=
+                    GLUT_LUMINANCE; /* Somebody fix this for me! */
+                break;
 
-        case 15 :  /* "stencil":  Number of bits in the stencil buffer */
-            glut_state_flag |= GLUT_STENCIL;  /* Somebody fix this for me! */
-            break ;
+            case 15: /* "stencil":  Number of bits in the stencil buffer */
+                glut_state_flag |= GLUT_STENCIL; /* Somebody fix this for me! */
+                break;
 
-        case 16 :  /* "single":  Boolean indicate the color buffer is single
-                      buffered */
-            glut_state_flag |= GLUT_SINGLE ;
-            break ;
+            case 16: /* "single":  Boolean indicate the color buffer is single
+                        buffered */
+                glut_state_flag |= GLUT_SINGLE;
+                break;
 
-        case 17 :  /* "stereo":  Boolean indicating the color buffer supports
-                      OpenGL-style stereo */
-            glut_state_flag |= GLUT_STEREO ;
-            break ;
+            case 17: /* "stereo":  Boolean indicating the color buffer supports
+                        OpenGL-style stereo */
+                glut_state_flag |= GLUT_STEREO;
+                break;
 
-        case 18 :  /* "samples":  Indicates the number of multisamples to use
-                      based on GLX's SGIS_multisample extension (for
-                      antialiasing) */
-            glut_state_flag |= GLUT_MULTISAMPLE ; /*Somebody fix this for me!*/
-            break ;
+            case 18: /* "samples":  Indicates the number of multisamples to use
+                        based on GLX's SGIS_multisample extension (for
+                        antialiasing) */
+                glut_state_flag |=
+                    GLUT_MULTISAMPLE; /*Somebody fix this for me!*/
+                break;
 
-        case 19 :  /* "slow":  Boolean indicating if the frame buffer
-                      configuration is slow or not */
-            break ;
+            case 19: /* "slow":  Boolean indicating if the frame buffer
+                        configuration is slow or not */
+                break;
 
-        case 20 :  /* "win32pdf": (incorrect spelling but was there before */
-        case 21 :  /* "win32pfd":  matches the Win32 Pixel Format Descriptor by
-                      number */
+            case 20: /* "win32pdf": (incorrect spelling but was there before */
+            case 21: /* "win32pfd":  matches the Win32 Pixel Format Descriptor
+                        by number */
 #if TARGET_HOST_MS_WINDOWS
 #endif
-            break ;
+                break;
 
-        case 22 :  /* "xvisual":  matches the X visual ID by number */
+            case 22: /* "xvisual":  matches the X visual ID by number */
 #if TARGET_HOST_POSIX_X11
 #endif
-            break ;
+                break;
 
-        case 23 :  /* "xstaticgray": */
-        case 29 :  /* "xstaticgrey":  boolean indicating if the frame buffer
-                      configuration's X visual is of type StaticGray */
+            case 23: /* "xstaticgray": */
+            case 29: /* "xstaticgrey":  boolean indicating if the frame buffer
+                        configuration's X visual is of type StaticGray */
 #if TARGET_HOST_POSIX_X11
 #endif
-            break ;
+                break;
 
-        case 24 :  /* "xgrayscale": */
-        case 30 :  /* "xgreyscale":  boolean indicating if the frame buffer
-                      configuration's X visual is of type GrayScale */
+            case 24: /* "xgrayscale": */
+            case 30: /* "xgreyscale":  boolean indicating if the frame buffer
+                        configuration's X visual is of type GrayScale */
 #if TARGET_HOST_POSIX_X11
 #endif
-            break ;
+                break;
 
-        case 25 :  /* "xstaticcolor": */
-        case 31 :  /* "xstaticcolour":  boolean indicating if the frame buffer
-                      configuration's X visual is of type StaticColor */
+            case 25: /* "xstaticcolor": */
+            case 31: /* "xstaticcolour":  boolean indicating if the frame buffer
+                        configuration's X visual is of type StaticColor */
 #if TARGET_HOST_POSIX_X11
 #endif
-            break ;
+                break;
 
-        case 26 :  /* "xpseudocolor": */
-        case 32 :  /* "xpseudocolour":  boolean indicating if the frame buffer
-                      configuration's X visual is of type PseudoColor */
+            case 26: /* "xpseudocolor": */
+            case 32: /* "xpseudocolour":  boolean indicating if the frame buffer
+                        configuration's X visual is of type PseudoColor */
 #if TARGET_HOST_POSIX_X11
 #endif
-            break ;
+                break;
 
-        case 27 :  /* "xtruecolor": */
-        case 33 :  /* "xtruecolour":  boolean indicating if the frame buffer
-                      configuration's X visual is of type TrueColor */
+            case 27: /* "xtruecolor": */
+            case 33: /* "xtruecolour":  boolean indicating if the frame buffer
+                        configuration's X visual is of type TrueColor */
 #if TARGET_HOST_POSIX_X11
 #endif
-            break ;
+                break;
 
-        case 28 :  /* "xdirectcolor": */
-        case 34 :  /* "xdirectcolour":  boolean indicating if the frame buffer
-                      configuration's X visual is of type DirectColor */
+            case 28: /* "xdirectcolor": */
+            case 34: /* "xdirectcolour":  boolean indicating if the frame buffer
+                        configuration's X visual is of type DirectColor */
 #if TARGET_HOST_POSIX_X11
 #endif
-            break ;
+                break;
 
-        case 35 :  /* "borderless":  windows should not have borders */
+            case 35: /* "borderless":  windows should not have borders */
 #if TARGET_HOST_POSIX_X11
 #endif
-            glut_state_flag |= GLUT_BORDERLESS;
-            break ;
+                glut_state_flag |= GLUT_BORDERLESS;
+                break;
 
-        case 36 :  /* "aux":  some number of aux buffers */
-            glut_state_flag |= GLUT_AUX;
-            break ;
+            case 36: /* "aux":  some number of aux buffers */
+                glut_state_flag |= GLUT_AUX;
+                break;
 
-        case 37 :  /* Unrecognized */
-            fgWarning ( "WARNING - Display string token not recognized:  %s",
-                        token );
-            break ;
+            case 37: /* Unrecognized */
+                fgWarning("WARNING - Display string token not recognized:  %s",
+                          token);
+                break;
         }
 
-        token = strtok ( NULL, " \t" );
+        token = strtok(NULL, " \t");
     }
 
-    free ( buffer );
+    free(buffer);
 
     /* We will make use of this value when creating a new OpenGL context... */
     fgState.DisplayMode = glut_state_flag;
@@ -1144,21 +1124,20 @@ void FGAPIENTRY glutInitDisplayString( const char* displayMode )
 
 /* -- SETTING OPENGL 3.0 CONTEXT CREATION PARAMETERS ---------------------- */
 
-void FGAPIENTRY glutInitContextVersion( int majorVersion, int minorVersion )
+void FGAPIENTRY glutInitContextVersion(int majorVersion, int minorVersion)
 {
     /* We will make use of these valuse when creating a new OpenGL context... */
     fgState.MajorVersion = majorVersion;
     fgState.MinorVersion = minorVersion;
 }
 
-
-void FGAPIENTRY glutInitContextFlags( int flags )
+void FGAPIENTRY glutInitContextFlags(int flags)
 {
     /* We will make use of this value when creating a new OpenGL context... */
     fgState.ContextFlags = flags;
 }
 
-void FGAPIENTRY glutInitContextProfile( int profile )
+void FGAPIENTRY glutInitContextProfile(int profile)
 {
     /* We will make use of this value when creating a new OpenGL context... */
     fgState.ContextProfile = profile;
@@ -1169,16 +1148,18 @@ void FGAPIENTRY glutInitContextProfile( int profile )
 /*
  * Sets the user error handler (note the use of va_list for the args to the fmt)
  */
-void FGAPIENTRY glutInitErrorFunc( void (* vfgError) ( const char *fmt, va_list ap ) )
+void FGAPIENTRY glutInitErrorFunc(void (*vfgError)(const char* fmt, va_list ap))
 {
     /* This allows user programs to handle freeglut errors */
     fgState.ErrorFunc = vfgError;
 }
 
 /*
- * Sets the user warning handler (note the use of va_list for the args to the fmt)
+ * Sets the user warning handler (note the use of va_list for the args to the
+ * fmt)
  */
-void FGAPIENTRY glutInitWarningFunc( void (* vfgWarning) ( const char *fmt, va_list ap ) )
+void FGAPIENTRY glutInitWarningFunc(void (*vfgWarning)(const char* fmt,
+                                                       va_list ap))
 {
     /* This allows user programs to handle freeglut warnings */
     fgState.WarningFunc = vfgWarning;

@@ -25,8 +25,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#include <GL/freeglut.h>
 
 /*
  * NOTE: functions declared in this file probably will not be implemented.
@@ -34,12 +34,26 @@
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
-void FGAPIENTRY glutEstablishOverlay( void )             { /* Not implemented */ }
-void FGAPIENTRY glutRemoveOverlay( void )                { /* Not implemented */ }
-void FGAPIENTRY glutUseLayer( GLenum layer )             { /* Not implemented */ }
-void FGAPIENTRY glutPostOverlayRedisplay( void )         { /* Not implemented */ }
-void FGAPIENTRY glutPostWindowOverlayRedisplay( int ID ) { /* Not implemented */ }
-void FGAPIENTRY glutShowOverlay( void )                  { /* Not implemented */ }
-void FGAPIENTRY glutHideOverlay( void )                  { /* Not implemented */ }
+void FGAPIENTRY glutEstablishOverlay(void)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutRemoveOverlay(void)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutUseLayer(GLenum layer)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutPostOverlayRedisplay(void)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutPostWindowOverlayRedisplay(int ID)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutShowOverlay(void)
+{ /* Not implemented */
+}
+void FGAPIENTRY glutHideOverlay(void)
+{ /* Not implemented */
+}
 
 /*** END OF FILE ***/

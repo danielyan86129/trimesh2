@@ -25,8 +25,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <GL/freeglut.h>
 #include "freeglut_internal.h"
+#include <GL/freeglut.h>
 
 /*
  * TODO BEFORE THE STABLE RELEASE:
@@ -40,68 +40,70 @@
 /* -- PRIVATE FUNCTIONS --------------------------------------------------- */
 
 #if TARGET_HOST_POSIX_X11 || TARGET_HOST_MAC_OSX || TARGET_HOST_SOLARIS
-  #include <X11/cursorfont.h>
+#include <X11/cursorfont.h>
 
 /*
  * A factory method for an empty cursor
  */
-static Cursor getEmptyCursor( void )
+static Cursor getEmptyCursor(void)
 {
     static Cursor cursorNone = None;
-    if( cursorNone == None ) {
-        char cursorNoneBits[ 32 ];
+    if (cursorNone == None)
+    {
+        char cursorNoneBits[32];
         XColor dontCare;
         Pixmap cursorNonePixmap;
-        memset( cursorNoneBits, 0, sizeof( cursorNoneBits ) );
-        memset( &dontCare, 0, sizeof( dontCare ) );
-        cursorNonePixmap = XCreateBitmapFromData ( fgDisplay.Display,
-                                                   fgDisplay.RootWindow,
-                                                   cursorNoneBits, 16, 16 );
-        if( cursorNonePixmap != None ) {
-            cursorNone = XCreatePixmapCursor( fgDisplay.Display,
-                                              cursorNonePixmap, cursorNonePixmap,
-                                              &dontCare, &dontCare, 0, 0 );
-            XFreePixmap( fgDisplay.Display, cursorNonePixmap );
+        memset(cursorNoneBits, 0, sizeof(cursorNoneBits));
+        memset(&dontCare, 0, sizeof(dontCare));
+        cursorNonePixmap = XCreateBitmapFromData(
+            fgDisplay.Display, fgDisplay.RootWindow, cursorNoneBits, 16, 16);
+        if (cursorNonePixmap != None)
+        {
+            cursorNone = XCreatePixmapCursor(fgDisplay.Display,
+                                             cursorNonePixmap, cursorNonePixmap,
+                                             &dontCare, &dontCare, 0, 0);
+            XFreePixmap(fgDisplay.Display, cursorNonePixmap);
         }
     }
     return cursorNone;
 }
 
 typedef struct tag_cursorCacheEntry cursorCacheEntry;
-struct tag_cursorCacheEntry {
-    unsigned int cursorShape;    /* an XC_foo value */
-    Cursor cachedCursor;         /* None if the corresponding cursor has
-                                    not been created yet */
+struct tag_cursorCacheEntry
+{
+    unsigned int cursorShape; /* an XC_foo value */
+    Cursor cachedCursor;      /* None if the corresponding cursor has
+                                 not been created yet */
 };
 
 /*
  * Note: The arrangement of the table below depends on the fact that
  * the "normal" GLUT_CURSOR_* values start a 0 and are consecutive.
- */ 
+ */
 static cursorCacheEntry cursorCache[] = {
-    { XC_arrow,               None }, /* GLUT_CURSOR_RIGHT_ARROW */
-    { XC_top_left_arrow,      None }, /* GLUT_CURSOR_LEFT_ARROW */
-    { XC_hand1,               None }, /* GLUT_CURSOR_INFO */
-    { XC_pirate,              None }, /* GLUT_CURSOR_DESTROY */
-    { XC_question_arrow,      None }, /* GLUT_CURSOR_HELP */
-    { XC_exchange,            None }, /* GLUT_CURSOR_CYCLE */
-    { XC_spraycan,            None }, /* GLUT_CURSOR_SPRAY */
-    { XC_watch,               None }, /* GLUT_CURSOR_WAIT */
-    { XC_xterm,               None }, /* GLUT_CURSOR_TEXT */
-    { XC_crosshair,           None }, /* GLUT_CURSOR_CROSSHAIR */
-    { XC_sb_v_double_arrow,   None }, /* GLUT_CURSOR_UP_DOWN */
-    { XC_sb_h_double_arrow,   None }, /* GLUT_CURSOR_LEFT_RIGHT */
-    { XC_top_side,            None }, /* GLUT_CURSOR_TOP_SIDE */
-    { XC_bottom_side,         None }, /* GLUT_CURSOR_BOTTOM_SIDE */
-    { XC_left_side,           None }, /* GLUT_CURSOR_LEFT_SIDE */
-    { XC_right_side,          None }, /* GLUT_CURSOR_RIGHT_SIDE */
-    { XC_top_left_corner,     None }, /* GLUT_CURSOR_TOP_LEFT_CORNER */
-    { XC_top_right_corner,    None }, /* GLUT_CURSOR_TOP_RIGHT_CORNER */
-    { XC_bottom_right_corner, None }, /* GLUT_CURSOR_BOTTOM_RIGHT_CORNER */
-    { XC_bottom_left_corner,  None }  /* GLUT_CURSOR_BOTTOM_LEFT_CORNER */
+    {XC_arrow, None},               /* GLUT_CURSOR_RIGHT_ARROW */
+    {XC_top_left_arrow, None},      /* GLUT_CURSOR_LEFT_ARROW */
+    {XC_hand1, None},               /* GLUT_CURSOR_INFO */
+    {XC_pirate, None},              /* GLUT_CURSOR_DESTROY */
+    {XC_question_arrow, None},      /* GLUT_CURSOR_HELP */
+    {XC_exchange, None},            /* GLUT_CURSOR_CYCLE */
+    {XC_spraycan, None},            /* GLUT_CURSOR_SPRAY */
+    {XC_watch, None},               /* GLUT_CURSOR_WAIT */
+    {XC_xterm, None},               /* GLUT_CURSOR_TEXT */
+    {XC_crosshair, None},           /* GLUT_CURSOR_CROSSHAIR */
+    {XC_sb_v_double_arrow, None},   /* GLUT_CURSOR_UP_DOWN */
+    {XC_sb_h_double_arrow, None},   /* GLUT_CURSOR_LEFT_RIGHT */
+    {XC_top_side, None},            /* GLUT_CURSOR_TOP_SIDE */
+    {XC_bottom_side, None},         /* GLUT_CURSOR_BOTTOM_SIDE */
+    {XC_left_side, None},           /* GLUT_CURSOR_LEFT_SIDE */
+    {XC_right_side, None},          /* GLUT_CURSOR_RIGHT_SIDE */
+    {XC_top_left_corner, None},     /* GLUT_CURSOR_TOP_LEFT_CORNER */
+    {XC_top_right_corner, None},    /* GLUT_CURSOR_TOP_RIGHT_CORNER */
+    {XC_bottom_right_corner, None}, /* GLUT_CURSOR_BOTTOM_RIGHT_CORNER */
+    {XC_bottom_left_corner, None}   /* GLUT_CURSOR_BOTTOM_LEFT_CORNER */
 };
 
-static void fghSetCursor ( SFG_Window *window, int cursorID )
+static void fghSetCursor(SFG_Window* window, int cursorID)
 {
     Cursor cursor;
     /*
@@ -109,159 +111,157 @@ static void fghSetCursor ( SFG_Window *window, int cursorID )
      * for this, but if there is a system that easily supports a full-
      * window (or full-screen) crosshair, we might consider it.
      */
-    int cursorIDToUse =
-        ( cursorID == GLUT_CURSOR_FULL_CROSSHAIR ) ? GLUT_CURSOR_CROSSHAIR : cursorID;
+    int cursorIDToUse = (cursorID == GLUT_CURSOR_FULL_CROSSHAIR)
+                            ? GLUT_CURSOR_CROSSHAIR
+                            : cursorID;
 
-    if( ( cursorIDToUse >= 0 ) &&
-        ( cursorIDToUse < (int) (sizeof( cursorCache ) / sizeof( cursorCache[0] ) ) ) ) {
-        cursorCacheEntry *entry = &cursorCache[ cursorIDToUse ];
-        if( entry->cachedCursor == None ) {
+    if ((cursorIDToUse >= 0) &&
+        (cursorIDToUse < (int)(sizeof(cursorCache) / sizeof(cursorCache[0]))))
+    {
+        cursorCacheEntry* entry = &cursorCache[cursorIDToUse];
+        if (entry->cachedCursor == None)
+        {
             entry->cachedCursor =
-                XCreateFontCursor( fgDisplay.Display, entry->cursorShape );
+                XCreateFontCursor(fgDisplay.Display, entry->cursorShape);
         }
         cursor = entry->cachedCursor;
-    } else {
-        switch( cursorIDToUse )
+    }
+    else
+    {
+        switch (cursorIDToUse)
         {
-        case GLUT_CURSOR_NONE:
-            cursor = getEmptyCursor( );
-            break;
+            case GLUT_CURSOR_NONE:
+                cursor = getEmptyCursor();
+                break;
 
-        case GLUT_CURSOR_INHERIT:
-            cursor = None;
-            break;
+            case GLUT_CURSOR_INHERIT:
+                cursor = None;
+                break;
 
-        default:
-            fgError( "Unknown cursor type: %d", cursorIDToUse );
-            return;
+            default:
+                fgError("Unknown cursor type: %d", cursorIDToUse);
+                return;
         }
     }
 
-    if ( cursorIDToUse == GLUT_CURSOR_INHERIT ) {
-        XUndefineCursor( fgDisplay.Display, window->Window.Handle );
-    } else if ( cursor != None ) {
-        XDefineCursor( fgDisplay.Display, window->Window.Handle, cursor );
-    } else if ( cursorIDToUse != GLUT_CURSOR_NONE ) {
-        fgError( "Failed to create cursor" );
+    if (cursorIDToUse == GLUT_CURSOR_INHERIT)
+    {
+        XUndefineCursor(fgDisplay.Display, window->Window.Handle);
+    }
+    else if (cursor != None)
+    {
+        XDefineCursor(fgDisplay.Display, window->Window.Handle, cursor);
+    }
+    else if (cursorIDToUse != GLUT_CURSOR_NONE)
+    {
+        fgError("Failed to create cursor");
     }
 }
 
-
-static void fghWarpPointer ( int x, int y )
+static void fghWarpPointer(int x, int y)
 {
-    XWarpPointer(
-        fgDisplay.Display,
-        None,
-        fgStructure.CurrentWindow->Window.Handle,
-        0, 0, 0, 0,
-        x, y
-    );
+    XWarpPointer(fgDisplay.Display, None,
+                 fgStructure.CurrentWindow->Window.Handle, 0, 0, 0, 0, x, y);
     /* Make the warp visible immediately. */
-    XFlush( fgDisplay.Display );
+    XFlush(fgDisplay.Display);
 }
 
-void fghGetCursorPos(SFG_XYUse *mouse_pos)
+void fghGetCursorPos(SFG_XYUse* mouse_pos)
 {
     /* Get current pointer location in screen coordinates
-    */
+     */
     Window junk_window;
     unsigned int junk_mask;
     int junk_pos;
-    
-    XQueryPointer(fgDisplay.Display, fgDisplay.RootWindow,
-            &junk_window, &junk_window,
-            &mouse_pos->X, &mouse_pos->Y,
-            &junk_pos, &junk_pos, &junk_mask);
-    
+
+    XQueryPointer(fgDisplay.Display, fgDisplay.RootWindow, &junk_window,
+                  &junk_window, &mouse_pos->X, &mouse_pos->Y, &junk_pos,
+                  &junk_pos, &junk_mask);
+
     mouse_pos->Use = GL_TRUE;
 }
 #endif
 
-
 #if TARGET_HOST_MS_WINDOWS
-static void fghSetCursor ( SFG_Window *window, int cursorID )
+static void fghSetCursor(SFG_Window* window, int cursorID)
 {
     /*
      * Joe Krahn is re-writing the following code.
      */
     /* Set the cursor AND change it for this window class. */
 #if !defined(__MINGW64__) && _MSC_VER <= 1200
-#       define MAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( LoadCursor( NULL, b ) );                  \
-            SetClassLong( window->Window.Handle,                 \
-                          GCL_HCURSOR,                           \
-                          ( LONG )LoadCursor( NULL, b ) );       \
+#define MAP_CURSOR(a, b)                                                       \
+    case a:                                                                    \
+        SetCursor(LoadCursor(NULL, b));                                        \
+        SetClassLong(window->Window.Handle, GCL_HCURSOR,                       \
+                     (LONG)LoadCursor(NULL, b));                               \
         break;
     /* Nuke the cursor AND change it for this window class. */
-#       define ZAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( NULL );                                   \
-            SetClassLong( window->Window.Handle,                 \
-                          GCL_HCURSOR, ( LONG )NULL );           \
+#define ZAP_CURSOR(a, b)                                                       \
+    case a:                                                                    \
+        SetCursor(NULL);                                                       \
+        SetClassLong(window->Window.Handle, GCL_HCURSOR, (LONG)NULL);          \
         break;
 #else
-#       define MAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( LoadCursor( NULL, b ) );                  \
-            SetClassLongPtr( window->Window.Handle,              \
-                          GCLP_HCURSOR,                          \
-                          ( LONG )( LONG_PTR )LoadCursor( NULL, b ) );       \
+#define MAP_CURSOR(a, b)                                                       \
+    case a:                                                                    \
+        SetCursor(LoadCursor(NULL, b));                                        \
+        SetClassLongPtr(window->Window.Handle, GCLP_HCURSOR,                   \
+                        (LONG)(LONG_PTR)LoadCursor(NULL, b));                  \
         break;
     /* Nuke the cursor AND change it for this window class. */
-#       define ZAP_CURSOR(a,b)                                   \
-        case a:                                                  \
-            SetCursor( NULL );                                   \
-            SetClassLongPtr( window->Window.Handle,              \
-                          GCLP_HCURSOR, ( LONG )( LONG_PTR )NULL );          \
+#define ZAP_CURSOR(a, b)                                                       \
+    case a:                                                                    \
+        SetCursor(NULL);                                                       \
+        SetClassLongPtr(window->Window.Handle, GCLP_HCURSOR,                   \
+                        (LONG)(LONG_PTR)NULL);                                 \
         break;
 #endif
 
-    switch( cursorID )
+    switch (cursorID)
     {
-        MAP_CURSOR( GLUT_CURSOR_RIGHT_ARROW,         IDC_ARROW     );
-        MAP_CURSOR( GLUT_CURSOR_LEFT_ARROW,          IDC_ARROW     );
-        MAP_CURSOR( GLUT_CURSOR_INFO,                IDC_HELP      );
-        MAP_CURSOR( GLUT_CURSOR_DESTROY,             IDC_CROSS     );
-        MAP_CURSOR( GLUT_CURSOR_HELP,                IDC_HELP      );
-        MAP_CURSOR( GLUT_CURSOR_CYCLE,               IDC_SIZEALL   );
-        MAP_CURSOR( GLUT_CURSOR_SPRAY,               IDC_CROSS     );
-        MAP_CURSOR( GLUT_CURSOR_WAIT,                IDC_WAIT      );
-        MAP_CURSOR( GLUT_CURSOR_TEXT,                IDC_IBEAM     );
-        MAP_CURSOR( GLUT_CURSOR_CROSSHAIR,           IDC_CROSS     );
-        MAP_CURSOR( GLUT_CURSOR_UP_DOWN,             IDC_SIZENS    );
-        MAP_CURSOR( GLUT_CURSOR_LEFT_RIGHT,          IDC_SIZEWE    );
-        MAP_CURSOR( GLUT_CURSOR_TOP_SIDE,            IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_BOTTOM_SIDE,         IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_LEFT_SIDE,           IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_RIGHT_SIDE,          IDC_ARROW     ); /* XXX ToDo */
-        MAP_CURSOR( GLUT_CURSOR_TOP_LEFT_CORNER,     IDC_SIZENWSE  );
-        MAP_CURSOR( GLUT_CURSOR_TOP_RIGHT_CORNER,    IDC_SIZENESW  );
-        MAP_CURSOR( GLUT_CURSOR_BOTTOM_RIGHT_CORNER, IDC_SIZENWSE  );
-        MAP_CURSOR( GLUT_CURSOR_BOTTOM_LEFT_CORNER,  IDC_SIZENESW  );
-        MAP_CURSOR( GLUT_CURSOR_INHERIT,             IDC_ARROW     ); /* XXX ToDo */
-        ZAP_CURSOR( GLUT_CURSOR_NONE,                NULL          );
-        MAP_CURSOR( GLUT_CURSOR_FULL_CROSSHAIR,      IDC_CROSS     ); /* XXX ToDo */
+        MAP_CURSOR(GLUT_CURSOR_RIGHT_ARROW, IDC_ARROW);
+        MAP_CURSOR(GLUT_CURSOR_LEFT_ARROW, IDC_ARROW);
+        MAP_CURSOR(GLUT_CURSOR_INFO, IDC_HELP);
+        MAP_CURSOR(GLUT_CURSOR_DESTROY, IDC_CROSS);
+        MAP_CURSOR(GLUT_CURSOR_HELP, IDC_HELP);
+        MAP_CURSOR(GLUT_CURSOR_CYCLE, IDC_SIZEALL);
+        MAP_CURSOR(GLUT_CURSOR_SPRAY, IDC_CROSS);
+        MAP_CURSOR(GLUT_CURSOR_WAIT, IDC_WAIT);
+        MAP_CURSOR(GLUT_CURSOR_TEXT, IDC_IBEAM);
+        MAP_CURSOR(GLUT_CURSOR_CROSSHAIR, IDC_CROSS);
+        MAP_CURSOR(GLUT_CURSOR_UP_DOWN, IDC_SIZENS);
+        MAP_CURSOR(GLUT_CURSOR_LEFT_RIGHT, IDC_SIZEWE);
+        MAP_CURSOR(GLUT_CURSOR_TOP_SIDE, IDC_ARROW);    /* XXX ToDo */
+        MAP_CURSOR(GLUT_CURSOR_BOTTOM_SIDE, IDC_ARROW); /* XXX ToDo */
+        MAP_CURSOR(GLUT_CURSOR_LEFT_SIDE, IDC_ARROW);   /* XXX ToDo */
+        MAP_CURSOR(GLUT_CURSOR_RIGHT_SIDE, IDC_ARROW);  /* XXX ToDo */
+        MAP_CURSOR(GLUT_CURSOR_TOP_LEFT_CORNER, IDC_SIZENWSE);
+        MAP_CURSOR(GLUT_CURSOR_TOP_RIGHT_CORNER, IDC_SIZENESW);
+        MAP_CURSOR(GLUT_CURSOR_BOTTOM_RIGHT_CORNER, IDC_SIZENWSE);
+        MAP_CURSOR(GLUT_CURSOR_BOTTOM_LEFT_CORNER, IDC_SIZENESW);
+        MAP_CURSOR(GLUT_CURSOR_INHERIT, IDC_ARROW); /* XXX ToDo */
+        ZAP_CURSOR(GLUT_CURSOR_NONE, NULL);
+        MAP_CURSOR(GLUT_CURSOR_FULL_CROSSHAIR, IDC_CROSS); /* XXX ToDo */
 
-    default:
-        fgError( "Unknown cursor type: %d", cursorID );
-        break;
+        default:
+            fgError("Unknown cursor type: %d", cursorID);
+            break;
     }
 }
 
-
-static void fghWarpPointer ( int x, int y )
+static void fghWarpPointer(int x, int y)
 {
     POINT coords;
     coords.x = x;
     coords.y = y;
 
     /* ClientToScreen() translates {coords} for us. */
-    ClientToScreen( fgStructure.CurrentWindow->Window.Handle, &coords );
-    SetCursorPos( coords.x, coords.y );
+    ClientToScreen(fgStructure.CurrentWindow->Window.Handle, &coords);
+    SetCursorPos(coords.x, coords.y);
 }
 
-void fghGetCursorPos(SFG_XYUse *mouse_pos)
+void fghGetCursorPos(SFG_XYUse* mouse_pos)
 {
     /* Get current pointer location in screen coordinates
      */
@@ -274,37 +274,35 @@ void fghGetCursorPos(SFG_XYUse *mouse_pos)
 }
 #endif
 
-
 /* -- INTERNAL FUNCTIONS ---------------------------------------------------- */
-void fgSetCursor ( SFG_Window *window, int cursorID )
+void fgSetCursor(SFG_Window* window, int cursorID)
 {
-    fghSetCursor ( window, cursorID );
+    fghSetCursor(window, cursorID);
 }
-
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
 /*
  * Set the cursor image to be used for the current window
  */
-void FGAPIENTRY glutSetCursor( int cursorID )
+void FGAPIENTRY glutSetCursor(int cursorID)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutSetCursor" );
-    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutSetCursor" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutSetCursor");
+    FREEGLUT_EXIT_IF_NO_WINDOW("glutSetCursor");
 
-    fghSetCursor ( fgStructure.CurrentWindow, cursorID );
+    fghSetCursor(fgStructure.CurrentWindow, cursorID);
     fgStructure.CurrentWindow->State.Cursor = cursorID;
 }
 
 /*
  * Moves the mouse pointer to given window coordinates
  */
-void FGAPIENTRY glutWarpPointer( int x, int y )
+void FGAPIENTRY glutWarpPointer(int x, int y)
 {
-    FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutWarpPointer" );
-    FREEGLUT_EXIT_IF_NO_WINDOW ( "glutWarpPointer" );
+    FREEGLUT_EXIT_IF_NOT_INITIALISED("glutWarpPointer");
+    FREEGLUT_EXIT_IF_NO_WINDOW("glutWarpPointer");
 
-    fghWarpPointer ( x, y );
+    fghWarpPointer(x, y);
 }
 
 /*** END OF FILE ***/

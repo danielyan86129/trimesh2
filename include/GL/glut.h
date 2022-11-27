@@ -4,8 +4,8 @@
 
 #else
 
-#ifndef  __GLUT_H__
-#define  __GLUT_H__
+#ifndef __GLUT_H__
+#define __GLUT_H__
 
 /*
  * glut.h
